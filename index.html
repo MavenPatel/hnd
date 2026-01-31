@@ -1,152 +1,330 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Google Ads Budget & Conversion Planner</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f4f6f9;
-            padding: 30px;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            max-width: 700px;
-            margin: auto;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0 15px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #0f5ad1;
-        }
-        .result {
-            margin-top: 20px;
-            background: #eef2ff;
-            padding: 15px;
-            border-radius: 8px;
-        }
-    </style>
+<title>Google Ads Smart Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1a73e8, #4e73df, #6f42c1);
+    background-size: 300% 300%;
+    animation: gradientMove 8s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+
+.container {
+    max-width: 1150px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.dashboard {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.header h1 {
+    margin: 0;
+    color: #1a73e8;
+}
+
+.dateTime {
+    font-size: 14px;
+    color: #555;
+}
+
+.section {
+    margin-top: 30px;
+}
+
+.section h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+input, select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 6px rgba(26,115,232,0.4);
+}
+
+.custom-days {
+    display: none;
+    margin-top: 10px;
+}
+
+.custom-days label {
+    margin-right: 12px;
+    font-size: 13px;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    margin-top: 30px;
+}
+
+.kpi-card {
+    background: white;
+    padding: 18px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-6px);
+}
+
+.kpi-title {
+    font-size: 13px;
+    color: #666;
+}
+
+.kpi-value {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.good { color: #28a745; }
+.bad { color: #dc3545; }
+
+.footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 13px;
+    color: #777;
+}
+
+</style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Google Ads Monthly Planner</h2>
+<div class="dashboard">
 
-    <h3>Yesterday Data</h3>
-    <input type="number" id="ySpend" placeholder="Yesterday Spend">
-    <input type="number" id="yConv" placeholder="Yesterday Conversions">
+<div class="header">
+    <h1>📊 Google Ads Performance Dashboard</h1>
+    <div class="dateTime" id="dateTime"></div>
+</div>
 
-    <h3>Monthly Data (Till Today)</h3>
-    <input type="number" id="mSpend" placeholder="Monthly Total Spend">
-    <input type="number" id="mConv" placeholder="Monthly Total Conversions">
+<!-- YESTERDAY -->
+<div class="section">
+<h3>Yesterday Data</h3>
+<div class="grid-3">
+<input type="number" id="ySpend" placeholder="Spend" oninput="calculate()">
+<input type="number" id="yClicks" placeholder="Clicks" oninput="calculate()">
+<input type="number" id="yConv" placeholder="Conversions" oninput="calculate()">
+</div>
+</div>
 
-    <h3>Monthly Targets</h3>
-    <input type="number" id="targetConv" placeholder="Monthly Conversion Target">
-    <input type="number" id="targetAmount" placeholder="Monthly Amount Target (Budget)">
+<!-- MONTHLY -->
+<div class="section">
+<h3>Monthly Data</h3>
+<div class="grid-3">
+<input type="number" id="mSpend" placeholder="Spend" oninput="calculate()">
+<input type="number" id="mClicks" placeholder="Clicks" oninput="calculate()">
+<input type="number" id="mConv" placeholder="Conversions" oninput="calculate()">
+</div>
+</div>
 
-    <button onclick="calculateReport()">Generate Report</button>
+<!-- WORKING DAYS -->
+<div class="section">
+<h3>Campaign Working Days</h3>
+<select id="workingType" onchange="toggleCustomDays(); calculate();">
+<option value="all">Runs Everyday</option>
+<option value="weekday">Off Saturday & Sunday</option>
+<option value="custom">Custom Off Days</option>
+</select>
 
-    <div class="result" id="output"></div>
+<div class="custom-days" id="customDays">
+<label><input type="checkbox" value="0" onchange="calculate()"> Sun</label>
+<label><input type="checkbox" value="1" onchange="calculate()"> Mon</label>
+<label><input type="checkbox" value="2" onchange="calculate()"> Tue</label>
+<label><input type="checkbox" value="3" onchange="calculate()"> Wed</label>
+<label><input type="checkbox" value="4" onchange="calculate()"> Thu</label>
+<label><input type="checkbox" value="5" onchange="calculate()"> Fri</label>
+<label><input type="checkbox" value="6" onchange="calculate()"> Sat</label>
+</div>
+</div>
+
+<!-- TARGET -->
+<div class="section">
+<h3>Monthly Target</h3>
+<div class="grid-3">
+<input type="number" id="targetConv" placeholder="Target Conversions" oninput="calculate()">
+<input type="number" id="targetBudget" placeholder="Target Budget" oninput="calculate()">
+</div>
+</div>
+
+<!-- KPI CARDS -->
+<div class="kpi-grid">
+
+<div class="kpi-card">
+<div class="kpi-title">Yesterday CPA</div>
+<div class="kpi-value" id="yCPA">₹0</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-title">Monthly CPA</div>
+<div class="kpi-value" id="mCPA">₹0</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-title">Conversion Rate</div>
+<div class="kpi-value" id="mCR">0%</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-title">Remaining Conversions</div>
+<div class="kpi-value" id="remainConv">0</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-title">Remaining Budget</div>
+<div class="kpi-value" id="remainBudget">₹0</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-title">Remaining Working Days</div>
+<div class="kpi-value" id="remainDays">0</div>
+</div>
+
+<div class="kpi-card">
+<div class="kpi-title">Required Conv / Day</div>
+<div class="kpi-value" id="reqConvDay">0</div>
+</div>
+
+</div>
+
+<div class="footer">
+Smart insights for PPC marketers • Auto-updating dashboard
+</div>
+
+</div>
 </div>
 
 <script>
-function calculateReport() {
 
-    let ySpend = parseFloat(document.getElementById("ySpend").value) || 0;
-    let yConv = parseInt(document.getElementById("yConv").value) || 0;
+function updateDateTime() {
+    let now = new Date();
+    document.getElementById("dateTime").innerText =
+        now.toLocaleDateString("en-IN", {weekday:'long', day:'numeric', month:'long', year:'numeric'}) +
+        " | " +
+        now.toLocaleTimeString();
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
 
-    let mSpend = parseFloat(document.getElementById("mSpend").value) || 0;
-    let mConv = parseInt(document.getElementById("mConv").value) || 0;
+function toggleCustomDays() {
+    let type = document.getElementById("workingType").value;
+    document.getElementById("customDays").style.display =
+        type === "custom" ? "block" : "none";
+}
 
-    let targetConv = parseInt(document.getElementById("targetConv").value) || 0;
-    let targetAmount = parseFloat(document.getElementById("targetAmount").value) || 0;
+function calculate() {
 
-    let today = new Date();
-    let year = today.getFullYear();
-    let month = today.getMonth();
-    let currentDay = today.getDate();
-    let totalDays = new Date(year, month + 1, 0).getDate();
+let ySpend = parseFloat(document.getElementById("ySpend").value) || 0;
+let yClicks = parseFloat(document.getElementById("yClicks").value) || 0;
+let yConv = parseFloat(document.getElementById("yConv").value) || 0;
 
-    let remainingWorkingDays = 0;
-    let workingDaysPassed = 0;
+let mSpend = parseFloat(document.getElementById("mSpend").value) || 0;
+let mClicks = parseFloat(document.getElementById("mClicks").value) || 0;
+let mConv = parseFloat(document.getElementById("mConv").value) || 0;
 
-    for (let d = 1; d <= totalDays; d++) {
-        let checkDate = new Date(year, month, d);
-        let day = checkDate.getDay();
+let targetConv = parseFloat(document.getElementById("targetConv").value) || 0;
+let targetBudget = parseFloat(document.getElementById("targetBudget").value) || 0;
 
-        if (day !== 0 && day !== 6) {
-            if (d <= currentDay) {
-                workingDaysPassed++;
-            } else {
-                remainingWorkingDays++;
-            }
-        }
+let yCPA = yConv > 0 ? ySpend / yConv : 0;
+let mCPA = mConv > 0 ? mSpend / mConv : 0;
+let mCR = mClicks > 0 ? (mConv / mClicks) * 100 : 0;
+
+let remainingConv = targetConv - mConv;
+let remainingBudget = targetBudget - mSpend;
+
+// WORKING DAYS
+let today = new Date();
+let year = today.getFullYear();
+let month = today.getMonth();
+let currentDay = today.getDate();
+let totalDays = new Date(year, month + 1, 0).getDate();
+
+let remainingDays = 0;
+let type = document.getElementById("workingType").value;
+
+for (let d = currentDay + 1; d <= totalDays; d++) {
+    let checkDate = new Date(year, month, d);
+    let day = checkDate.getDay();
+    let isWorking = true;
+
+    if (type === "weekday") {
+        if (day === 0 || day === 6) isWorking = false;
     }
 
-    // CPA Calculations
-    let yesterdayCPA = yConv > 0 ? (ySpend / yConv).toFixed(2) : 0;
-    let monthlyCPA = mConv > 0 ? (mSpend / mConv).toFixed(2) : 0;
+    if (type === "custom") {
+        let selected = document.querySelectorAll('#customDays input:checked');
+        selected.forEach(cb => {
+            if (parseInt(cb.value) === day) isWorking = false;
+        });
+    }
 
-    // Average Conversions Per Working Day
-    let avgConvPerDay = workingDaysPassed > 0 
-        ? (mConv / workingDaysPassed).toFixed(2)
-        : 0;
-
-    // Remaining Targets
-    let remainingConv = targetConv - mConv;
-    let remainingAmount = targetAmount - mSpend;
-
-    // Required Daily Targets
-    let requiredConvPerDay = remainingWorkingDays > 0
-        ? (remainingConv / remainingWorkingDays).toFixed(2)
-        : 0;
-
-    let requiredSpendPerDay = remainingWorkingDays > 0
-        ? (remainingAmount / remainingWorkingDays).toFixed(2)
-        : 0;
-
-    let outputHTML = `
-        <h3>Report Summary</h3>
-
-        <b>Yesterday:</b><br>
-        Spend: ₹${ySpend}<br>
-        Conversions: ${yConv}<br>
-        Yesterday CPA: ₹${yesterdayCPA}<br><br>
-
-        <b>Monthly Performance:</b><br>
-        Total Spend: ₹${mSpend}<br>
-        Total Conversions: ${mConv}<br>
-        Monthly Avg CPA: ₹${monthlyCPA}<br>
-        Avg Conversion Per Working Day: ${avgConvPerDay}<br><br>
-
-        <b>Target Planning:</b><br>
-        Monthly Conversion Target: ${targetConv}<br>
-        Monthly Budget Target: ₹${targetAmount}<br><br>
-
-        Remaining Conversions: ${remainingConv}<br>
-        Remaining Budget: ₹${remainingAmount}<br>
-        Remaining Working Days: ${remainingWorkingDays}<br><br>
-
-        Required Conversions Per Day: ${requiredConvPerDay}<br>
-        Required Spend Per Day: ₹${requiredSpendPerDay}
-    `;
-
-    document.getElementById("output").innerHTML = outputHTML;
+    if (isWorking) remainingDays++;
 }
+
+let requiredConvPerDay = remainingDays > 0 ? remainingConv / remainingDays : 0;
+
+// UPDATE UI
+document.getElementById("yCPA").innerText = "₹" + yCPA.toFixed(2);
+document.getElementById("mCPA").innerText = "₹" + mCPA.toFixed(2);
+document.getElementById("mCR").innerText = mCR.toFixed(2) + "%";
+document.getElementById("remainConv").innerText = remainingConv.toFixed(0);
+document.getElementById("remainBudget").innerText = "₹" + remainingBudget.toFixed(2);
+document.getElementById("remainDays").innerText = remainingDays;
+document.getElementById("reqConvDay").innerText = requiredConvPerDay.toFixed(2);
+
+if(remainingConv <= 0){
+    document.getElementById("remainConv").classList.add("good");
+}else{
+    document.getElementById("remainConv").classList.remove("good");
+}
+
+}
+
 </script>
 
 </body>
