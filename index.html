@@ -1,330 +1,1192 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Google Ads Smart Dashboard</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Ads Tools Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
-
-body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #1a73e8, #4e73df, #6f42c1);
-    background-size: 300% 300%;
-    animation: gradientMove 8s ease infinite;
+/* ══ SWITCHER BAR ═══════════════════════════════════════════════════════ */
+.tool-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #111;
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  border-bottom: 1px solid #222;
+}
+.switcher-brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.02em;
+  margin-right: 24px;
+  white-space: nowrap;
+}
+.switcher-brand span {
+  color: #d4380d;
+}
+.switcher-tabs {
+  display: flex;
+  gap: 6px;
+}
+.sw-tab {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1.5px solid #2a2a2a;
+  background: transparent;
+  color: #666;
+  transition: all .18s;
+  white-space: nowrap;
+}
+.sw-tab:hover {
+  border-color: #444;
+  color: #aaa;
+}
+.sw-tab.active {
+  background: #d4380d;
+  color: #fff;
+  border-color: #d4380d;
 }
 
-@keyframes gradientMove {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
+/* ══ TOOL WRAPPERS ══════════════════════════════════════════════════════ */
+.tool-panel {
+  display: none;
+}
+.tool-panel.active {
+  display: block;
 }
 
-.container {
-    max-width: 1150px;
-    margin: 40px auto;
-    padding: 20px;
+/* ═══════════════════════════════════════════════════════════════════════
+   TOOL 1 — Google Ads Smart Dashboard
+═══════════════════════════════════════════════════════════════════════ */
+#tool1 body-equiv,
+.t1-root {
+  display: block;
+}
+.t1-root {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1a73e8, #4e73df, #6f42c1);
+  background-size: 300% 300%;
+  animation: t1gradientMove 8s ease infinite;
+  min-height: calc(100vh - 50px);
 }
 
-.dashboard {
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(12px);
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+@keyframes t1gradientMove {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+.t1-container {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
-.header h1 {
-    margin: 0;
-    color: #1a73e8;
+.t1-dashboard {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
 }
 
-.dateTime {
-    font-size: 14px;
-    color: #555;
+.t1-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.section {
-    margin-top: 30px;
+.t1-header h1 {
+  margin: 0;
+  color: #1a73e8;
 }
 
-.section h3 {
-    margin-bottom: 15px;
-    color: #333;
+.t1-dateTime {
+  font-size: 14px;
+  color: #555;
 }
 
-.grid-3 {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
+.t1-section {
+  margin-top: 30px;
 }
 
-input, select {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    font-size: 14px;
-    transition: 0.3s;
+.t1-section h3 {
+  margin-bottom: 15px;
+  color: #333;
 }
 
-input:focus, select:focus {
-    outline: none;
-    border-color: #1a73e8;
-    box-shadow: 0 0 6px rgba(26,115,232,0.4);
+.t1-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
 }
 
-.custom-days {
-    display: none;
-    margin-top: 10px;
+.t1-root input,
+.t1-root select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: 0.3s;
 }
 
-.custom-days label {
-    margin-right: 12px;
-    font-size: 13px;
+.t1-root input:focus,
+.t1-root select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 6px rgba(26,115,232,0.4);
 }
 
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 18px;
-    margin-top: 30px;
+.t1-custom-days {
+  display: none;
+  margin-top: 10px;
 }
 
-.kpi-card {
-    background: white;
-    padding: 18px;
-    border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
-    transition: 0.3s;
+.t1-custom-days label {
+  margin-right: 12px;
+  font-size: 13px;
 }
 
-.kpi-card:hover {
-    transform: translateY(-6px);
+.t1-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+  margin-top: 30px;
 }
 
-.kpi-title {
-    font-size: 13px;
-    color: #666;
+.t1-kpi-card {
+  background: white;
+  padding: 18px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+  transition: 0.3s;
 }
 
-.kpi-value {
-    font-size: 22px;
-    font-weight: bold;
-    margin-top: 8px;
+.t1-kpi-card:hover {
+  transform: translateY(-6px);
 }
 
-.good { color: #28a745; }
-.bad { color: #dc3545; }
-
-.footer {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 13px;
-    color: #777;
+.t1-kpi-title {
+  font-size: 13px;
+  color: #666;
 }
 
+.t1-kpi-value {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.t1-good { color: #28a745; }
+.t1-bad  { color: #dc3545; }
+
+.t1-footer {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 13px;
+  color: #777;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TOOL 2 — NegativeIQ (all styles scoped under #tool2)
+═══════════════════════════════════════════════════════════════════════ */
+#tool2 {
+  --ink:#0a0b0f;
+  --paper:#f5f4f0;
+  --paper2:#eeede8;
+  --paper3:#e5e3dc;
+  --line:#d4d2c8;
+  --line2:#c2bfb3;
+  --muted:#8a8880;
+  --dim:#b5b3aa;
+  --text:#1a1916;
+  --acc:#d4380d;
+  --acc2:#b52e08;
+  --acc-bg:#fff2ee;
+  --acc-line:#f5c4b5;
+  --green:#2d7a3a;
+  --green-bg:#edf7ef;
+  --green-line:#b5debb;
+  --blue:#1a4f8a;
+  --blue-bg:#eef4fc;
+  --blue-line:#b5cff0;
+  --amber:#8a5a00;
+  --amber-bg:#fef8ec;
+  --amber-line:#f0d990;
+  --purple:#5b3fa0;
+  --purple-bg:#f3f0fc;
+  --purple-line:#c9bcf0;
+  --teal:#1a6b6b;
+  --teal-bg:#eef8f8;
+  --teal-line:#b5dede;
+  --fn:'Syne',sans-serif;
+  --fm:'JetBrains Mono',monospace;
+  --r:8px;--rl:12px;--rxl:18px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.05);
+  --shadow-lg:0 4px 6px rgba(0,0,0,.07),0 10px 30px rgba(0,0,0,.08);
+  font-family: var(--fn);
+  background: var(--paper);
+  color: var(--text);
+  min-height: calc(100vh - 50px);
+  font-size: 15px;
+}
+
+#tool2 .shell{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 50px);}
+#tool2 .sidebar{background:var(--ink);color:#e8e6e0;padding:2rem 1.5rem;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto;display:flex;flex-direction:column;gap:1.5rem;}
+#tool2 .sidebar::-webkit-scrollbar{width:3px;}
+#tool2 .sidebar::-webkit-scrollbar-thumb{background:#333;border-radius:3px;}
+#tool2 .main{padding:2rem;overflow-y:auto;}
+
+#tool2 .brand{display:flex;align-items:center;gap:10px;margin-bottom:.5rem;}
+#tool2 .brand-icon{width:38px;height:38px;background:var(--acc);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#tool2 .brand-icon svg{width:20px;height:20px;fill:#fff;}
+#tool2 .brand-name{font-size:18px;font-weight:800;letter-spacing:-.02em;color:#fff;}
+#tool2 .brand-sub{font-size:11px;color:#666;font-family:var(--fm);margin-top:2px;}
+
+#tool2 .s-section{display:flex;flex-direction:column;gap:.6rem;}
+#tool2 .s-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#555;padding-bottom:6px;border-bottom:1px solid #1e1e1e;}
+#tool2 .s-field{display:flex;flex-direction:column;gap:5px;}
+#tool2 .s-flabel{font-size:12px;color:#888;font-weight:500;}
+
+#tool2 .s-input{width:100%;font-family:var(--fm);font-size:12px;background:#111;border:1px solid #2a2a2a;border-radius:var(--r);color:#e8e6e0;padding:9px 11px;outline:none;transition:border-color .2s,background .2s;resize:none;}
+#tool2 .s-input:focus{border-color:var(--acc);background:#161616;}
+#tool2 .s-input::placeholder{color:#444;}
+#tool2 textarea.s-input{min-height:200px;line-height:1.6;}
+#tool2 .s-select{width:100%;font-family:var(--fn);font-size:12.5px;background:#111;border:1px solid #2a2a2a;border-radius:var(--r);color:#e8e6e0;padding:8px 11px;outline:none;cursor:pointer;}
+#tool2 .s-select:focus{border-color:var(--acc);}
+
+#tool2 .tag-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+#tool2 .stag{font-size:11px;font-family:var(--fm);background:#1a1a1a;border:1px solid #2d2d2d;border-radius:20px;padding:3px 10px;color:#888;display:flex;align-items:center;gap:5px;}
+#tool2 .stag-x{cursor:pointer;color:#555;font-size:13px;line-height:1;transition:color .1s;}
+#tool2 .stag-x:hover{color:var(--acc);}
+#tool2 .add-row{display:flex;gap:6px;}
+#tool2 .add-row .s-input{flex:1;}
+#tool2 .btn-add-tag{font-family:var(--fn);font-size:11.5px;padding:7px 12px;border-radius:var(--r);cursor:pointer;border:1px solid #333;background:transparent;color:#666;white-space:nowrap;transition:all .15s;}
+#tool2 .btn-add-tag:hover{border-color:var(--acc);color:var(--acc);}
+
+#tool2 .api-card{background:#111;border:1px solid #222;border-radius:var(--rl);padding:1rem;}
+#tool2 .api-card-title{font-size:12.5px;font-weight:700;color:#e8e6e0;margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+#tool2 .api-card-title svg{width:14px;height:14px;fill:var(--acc);}
+#tool2 .api-steps{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+#tool2 .api-step{display:flex;gap:8px;font-size:11.5px;color:#666;line-height:1.5;}
+#tool2 .api-step a{color:var(--acc);text-decoration:none;}
+#tool2 .api-step a:hover{text-decoration:underline;}
+#tool2 .sn{width:16px;height:16px;border-radius:50%;background:var(--acc);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+#tool2 .key-row{display:flex;gap:6px;}
+#tool2 .btn-save-key{font-family:var(--fn);font-size:12px;font-weight:600;padding:8px 14px;border-radius:var(--r);border:none;background:var(--acc);color:#fff;cursor:pointer;transition:background .15s;white-space:nowrap;}
+#tool2 .btn-save-key:hover{background:var(--acc2);}
+#tool2 .key-status{font-size:11px;font-family:var(--fm);margin-top:6px;padding:5px 9px;border-radius:6px;display:none;}
+#tool2 .ks-ok{display:block;background:rgba(45,122,58,.15);color:#5cbb6e;border:1px solid rgba(45,122,58,.3);}
+#tool2 .ks-err{display:block;background:rgba(212,56,13,.15);color:#ff7a60;border:1px solid rgba(212,56,13,.3);}
+
+#tool2 .btn-analyze{width:100%;padding:13px;font-family:var(--fn);font-size:14px;font-weight:700;background:var(--acc);color:#fff;border:none;border-radius:var(--r);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.01em;}
+#tool2 .btn-analyze:hover{background:var(--acc2);transform:translateY(-1px);}
+#tool2 .btn-analyze:active{transform:translateY(0);}
+#tool2 .btn-analyze:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+#tool2 .btn-analyze svg{width:16px;height:16px;fill:currentColor;}
+
+#tool2 .load-section{display:none;flex-direction:column;gap:8px;}
+#tool2 .load-section.show{display:flex;}
+#tool2 .load-label{font-size:11.5px;color:#888;font-family:var(--fm);}
+#tool2 .load-sub{font-size:10.5px;color:#555;font-family:var(--fm);}
+#tool2 .prog-track{width:100%;height:2px;background:#1e1e1e;border-radius:2px;overflow:hidden;}
+#tool2 .prog-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .35s;}
+#tool2 .spin-row{display:flex;align-items:center;gap:8px;}
+#tool2 .spinner{width:14px;height:14px;border:2px solid #2a2a2a;border-top-color:var(--acc);border-radius:50%;animation:niq-spin .7s linear infinite;flex-shrink:0;}
+@keyframes niq-spin{to{transform:rotate(360deg);}}
+
+#tool2 .err-inline{background:rgba(212,56,13,.1);border:1px solid rgba(212,56,13,.25);border-radius:var(--r);padding:10px;font-size:12px;color:#ff7a60;display:none;line-height:1.6;margin-top:.5rem;}
+#tool2 .err-inline.show{display:block;}
+
+#tool2 .main-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;}
+#tool2 .main-title h2{font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
+#tool2 .main-title p{font-size:13px;color:var(--muted);margin-top:3px;}
+#tool2 .export-btns{display:flex;gap:8px;flex-shrink:0;}
+#tool2 .btn-export{font-family:var(--fn);font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:var(--r);cursor:pointer;border:1.5px solid var(--line2);background:#fff;color:var(--text);display:flex;align-items:center;gap:6px;transition:all .15s;box-shadow:var(--shadow);}
+#tool2 .btn-export:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-1px);box-shadow:var(--shadow-lg);}
+#tool2 .btn-export svg{width:15px;height:15px;}
+#tool2 .btn-export.primary{background:var(--acc);color:#fff;border-color:var(--acc);}
+#tool2 .btn-export.primary:hover{background:var(--acc2);border-color:var(--acc2);color:#fff;}
+
+#tool2 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
+#tool2 .stat-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--rl);padding:1rem 1.1rem;box-shadow:var(--shadow);transition:border-color .15s;}
+#tool2 .stat-card:hover{border-color:var(--line2);}
+#tool2 .stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+#tool2 .stat-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+#tool2 .stat-icon svg{width:14px;height:14px;}
+#tool2 .stat-num{font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1;font-family:var(--fm);}
+#tool2 .stat-label{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:3px;}
+#tool2 .stat-card.c-red .stat-icon{background:var(--acc-bg);} #tool2 .stat-card.c-red .stat-icon svg{fill:var(--acc);} #tool2 .stat-card.c-red .stat-num{color:var(--acc);}
+#tool2 .stat-card.c-grn .stat-icon{background:var(--green-bg);} #tool2 .stat-card.c-grn .stat-icon svg{fill:var(--green);} #tool2 .stat-card.c-grn .stat-num{color:var(--green);}
+#tool2 .stat-card.c-blu .stat-icon{background:var(--blue-bg);} #tool2 .stat-card.c-blu .stat-icon svg{fill:var(--blue);} #tool2 .stat-card.c-blu .stat-num{color:var(--blue);}
+#tool2 .stat-card.c-amb .stat-icon{background:var(--amber-bg);} #tool2 .stat-card.c-amb .stat-icon svg{fill:var(--amber);} #tool2 .stat-card.c-amb .stat-num{color:var(--amber);}
+#tool2 .stat-card.c-pur .stat-icon{background:var(--purple-bg);} #tool2 .stat-card.c-pur .stat-icon svg{fill:var(--purple);} #tool2 .stat-card.c-pur .stat-num{color:var(--purple);}
+#tool2 .stat-card.c-tel .stat-icon{background:var(--teal-bg);} #tool2 .stat-card.c-tel .stat-icon svg{fill:var(--teal);} #tool2 .stat-card.c-tel .stat-num{color:var(--teal);}
+
+#tool2 .sum-card{background:#fff;border:1.5px solid var(--blue-line);border-radius:var(--rl);padding:1rem 1.2rem;margin-bottom:1rem;font-size:13px;color:var(--muted);line-height:1.75;box-shadow:var(--shadow);}
+#tool2 .sum-card strong{color:var(--blue);font-weight:700;}
+#tool2 .sum-card .wt{color:var(--amber);font-weight:600;}
+
+#tool2 .alert{border-radius:var(--r);padding:10px 14px;margin-bottom:8px;font-size:12.5px;line-height:1.6;}
+#tool2 .al-amb{background:var(--purple-bg);border:1.5px solid var(--purple-line);color:var(--purple);}
+#tool2 .al-url{background:var(--teal-bg);border:1.5px solid var(--teal-line);color:var(--teal);}
+
+#tool2 .split{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+#tool2 .panel{background:#fff;border:1.5px solid var(--line);border-radius:var(--rl);overflow:hidden;box-shadow:var(--shadow);}
+#tool2 .ph{padding:12px 16px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--paper2);}
+#tool2 .ph-left{display:flex;align-items:center;gap:8px;}
+#tool2 .ph-dot{width:8px;height:8px;border-radius:50%;}
+#tool2 .ph-title{font-size:13px;font-weight:700;color:var(--text);}
+#tool2 .ph-cnt{font-size:11px;font-family:var(--fm);background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:2px 9px;color:var(--muted);}
+
+#tool2 .tabs{display:flex;gap:3px;padding:8px 10px;background:var(--paper3);border-bottom:1.5px solid var(--line);flex-wrap:wrap;}
+#tool2 .tab{padding:4px 10px;font-size:11.5px;font-weight:600;border-radius:6px;cursor:pointer;border:1.5px solid transparent;background:transparent;color:var(--dim);transition:all .12s;display:flex;align-items:center;gap:4px;font-family:var(--fn);}
+#tool2 .tab:hover{color:var(--muted);background:var(--paper2);}
+#tool2 .tab.active{background:var(--acc);color:#fff;border-color:var(--acc);}
+#tool2 .tn{font-size:10px;background:rgba(255,255,255,.25);border-radius:6px;padding:1px 5px;}
+
+#tool2 .sbar{display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--paper);border-bottom:1.5px solid var(--line);}
+#tool2 .sbar input{flex:1;background:none;border:none;outline:none;font-size:12.5px;color:var(--text);font-family:var(--fm);}
+#tool2 .sbar input::placeholder{color:var(--dim);}
+#tool2 .si{width:13px;height:13px;stroke:var(--dim);fill:none;stroke-width:2;flex-shrink:0;}
+
+#tool2 .pb{overflow-y:auto;max-height:440px;}
+#tool2 .pb::-webkit-scrollbar{width:3px;}
+#tool2 .pb::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px;}
+
+#tool2 .kw-item{padding:10px 14px;border-bottom:1.5px solid var(--line);transition:background .1s;cursor:default;}
+#tool2 .kw-item:hover{background:var(--paper);}
+#tool2 .kw-item:last-child{border-bottom:none;}
+#tool2 .kw-item.hl-amb{background:var(--purple-bg);border-left:3px solid var(--purple);}
+#tool2 .kw-item.hl-url{background:var(--teal-bg);border-left:3px solid var(--teal);}
+#tool2 .kwr1{display:flex;align-items:center;gap:7px;margin-bottom:3px;}
+#tool2 .kwt{font-size:12.5px;font-weight:600;font-family:var(--fm);color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#tool2 .bdg{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;letter-spacing:.03em;}
+#tool2 .bi{background:var(--acc-bg);color:var(--acc);border:1px solid var(--acc-line);}
+#tool2 .bc{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-line);}
+#tool2 .bl{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line);}
+#tool2 .bu{background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-line);}
+#tool2 .ba{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-line);}
+#tool2 .bge{background:#fdf0f8;color:#8a2060;border:1px solid #e8b5d5;}
+#tool2 .src-pill{font-size:9.5px;padding:1px 6px;border-radius:4px;font-family:var(--fm);font-weight:600;}
+#tool2 .sp-ai{background:var(--acc-bg);color:var(--acc);}
+#tool2 .sp-rule{background:var(--green-bg);color:var(--green);}
+#tool2 .kw-reason{font-size:11.5px;color:var(--muted);line-height:1.4;}
+#tool2 .conf-row{display:flex;align-items:center;gap:7px;margin-top:5px;}
+#tool2 .cbar{height:3px;width:60px;background:var(--paper3);border-radius:3px;overflow:hidden;}
+#tool2 .cfill{height:100%;border-radius:3px;}
+#tool2 .chi{background:var(--green);}#tool2 .cmd{background:var(--amber);}#tool2 .clo{background:var(--acc);}
+#tool2 .ctxt{font-size:10.5px;color:var(--dim);font-family:var(--fm);}
+
+#tool2 .kept-item{padding:9px 14px;border-bottom:1.5px solid var(--line);display:flex;align-items:center;gap:8px;}
+#tool2 .kept-item:hover{background:var(--paper);}
+#tool2 .kept-item:last-child{border-bottom:none;}
+#tool2 .ktick{width:16px;height:16px;border-radius:50%;background:var(--green-bg);border:1.5px solid var(--green-line);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#tool2 .ktick svg{width:8px;height:8px;stroke:var(--green);fill:none;stroke-width:2.5;}
+#tool2 .kterm{font-size:12.5px;font-family:var(--fm);color:var(--muted);}
+
+#tool2 .copy-card{background:#fff;border:1.5px solid var(--line);border-radius:var(--rl);padding:1.2rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+#tool2 .chead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+#tool2 .ctitle{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;}
+#tool2 .cbtns{display:flex;gap:7px;}
+#tool2 .btn-sm{font-family:var(--fn);font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;cursor:pointer;border:1.5px solid var(--line2);background:#fff;color:var(--muted);transition:all .12s;display:flex;align-items:center;gap:5px;}
+#tool2 .btn-sm:hover{border-color:var(--acc);color:var(--acc);}
+#tool2 .btn-sm.ok{border-color:var(--green);color:var(--green);background:var(--green-bg);}
+#tool2 .btn-sm svg{width:13px;height:13px;}
+#tool2 .cbox{font-family:var(--fm);font-size:12px;background:var(--paper);border:1.5px solid var(--line);border-radius:var(--r);padding:12px;white-space:pre-wrap;max-height:150px;overflow-y:auto;color:var(--muted);line-height:1.7;}
+
+#tool2 .btn-reset{font-family:var(--fn);font-size:13px;font-weight:600;color:var(--muted);background:none;border:1.5px solid var(--line2);border-radius:var(--r);padding:8px 18px;cursor:pointer;transition:all .15s;margin-top:.5rem;}
+#tool2 .btn-reset:hover{color:var(--text);border-color:var(--acc);}
+
+#tool2 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;text-align:center;}
+#tool2 .empty-icon{width:56px;height:56px;background:var(--paper3);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;}
+#tool2 .empty-icon svg{width:26px;height:26px;fill:var(--dim);}
+#tool2 .empty-title{font-size:16px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+#tool2 .empty-sub{font-size:13px;color:var(--dim);max-width:280px;line-height:1.6;}
+
+#tool2 .results-wrap{display:none;}
+#tool2 .results-wrap.show{display:block;}
+#tool2 .list-empty{text-align:center;padding:2rem;color:var(--dim);font-size:13px;}
+
+#tool2 .fade-in{animation:niq-fadeIn .3s ease both;}
+@keyframes niq-fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+@media(max-width:900px){
+  #tool2 .shell{grid-template-columns:1fr;}
+  #tool2 .sidebar{position:relative;height:auto;top:0;}
+  #tool2 .split{grid-template-columns:1fr;}
+  #tool2 .stats-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:540px){#tool2 .stats-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
-<body>
+<body style="margin:0;padding:0;">
 
-<div class="container">
-<div class="dashboard">
+<!-- ══ SWITCHER BAR ══════════════════════════════════════════════════════ -->
+<div class="tool-switcher">
+  <div class="switcher-brand">Ads<span>Tools</span></div>
+  <div class="switcher-tabs">
+    <button class="sw-tab active" onclick="switchTool('tool1', this)">📊 Performance Dashboard</button>
+    <button class="sw-tab" onclick="switchTool('tool2', this)">🔍 NegativeIQ Analyzer</button>
+  </div>
+</div>
 
-<div class="header">
-    <h1>📊 Google Ads Performance Dashboard</h1>
-    <div class="dateTime" id="dateTime"></div>
+<!-- ══════════════════════════════════════════════════════════════════════
+     TOOL 1 — Google Ads Smart Dashboard
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tool1" class="tool-panel active">
+<div class="t1-root">
+<div class="t1-container">
+<div class="t1-dashboard">
+
+<div class="t1-header">
+  <h1>📊 Google Ads Performance Dashboard</h1>
+  <div class="t1-dateTime" id="t1dateTime"></div>
 </div>
 
 <!-- YESTERDAY -->
-<div class="section">
-<h3>Yesterday Data</h3>
-<div class="grid-3">
-<input type="number" id="ySpend" placeholder="Spend" oninput="calculate()">
-<input type="number" id="yClicks" placeholder="Clicks" oninput="calculate()">
-<input type="number" id="yConv" placeholder="Conversions" oninput="calculate()">
-</div>
+<div class="t1-section">
+  <h3>Yesterday Data</h3>
+  <div class="t1-grid-3">
+    <input type="number" id="ySpend" placeholder="Spend" oninput="t1calculate()">
+    <input type="number" id="yClicks" placeholder="Clicks" oninput="t1calculate()">
+    <input type="number" id="yConv" placeholder="Conversions" oninput="t1calculate()">
+  </div>
 </div>
 
 <!-- MONTHLY -->
-<div class="section">
-<h3>Monthly Data</h3>
-<div class="grid-3">
-<input type="number" id="mSpend" placeholder="Spend" oninput="calculate()">
-<input type="number" id="mClicks" placeholder="Clicks" oninput="calculate()">
-<input type="number" id="mConv" placeholder="Conversions" oninput="calculate()">
-</div>
+<div class="t1-section">
+  <h3>Monthly Data</h3>
+  <div class="t1-grid-3">
+    <input type="number" id="mSpend" placeholder="Spend" oninput="t1calculate()">
+    <input type="number" id="mClicks" placeholder="Clicks" oninput="t1calculate()">
+    <input type="number" id="mConv" placeholder="Conversions" oninput="t1calculate()">
+  </div>
 </div>
 
 <!-- WORKING DAYS -->
-<div class="section">
-<h3>Campaign Working Days</h3>
-<select id="workingType" onchange="toggleCustomDays(); calculate();">
-<option value="all">Runs Everyday</option>
-<option value="weekday">Off Saturday & Sunday</option>
-<option value="custom">Custom Off Days</option>
-</select>
-
-<div class="custom-days" id="customDays">
-<label><input type="checkbox" value="0" onchange="calculate()"> Sun</label>
-<label><input type="checkbox" value="1" onchange="calculate()"> Mon</label>
-<label><input type="checkbox" value="2" onchange="calculate()"> Tue</label>
-<label><input type="checkbox" value="3" onchange="calculate()"> Wed</label>
-<label><input type="checkbox" value="4" onchange="calculate()"> Thu</label>
-<label><input type="checkbox" value="5" onchange="calculate()"> Fri</label>
-<label><input type="checkbox" value="6" onchange="calculate()"> Sat</label>
-</div>
+<div class="t1-section">
+  <h3>Campaign Working Days</h3>
+  <select id="workingType" onchange="t1toggleCustomDays(); t1calculate();">
+    <option value="all">Runs Everyday</option>
+    <option value="weekday">Off Saturday & Sunday</option>
+    <option value="custom">Custom Off Days</option>
+  </select>
+  <div class="t1-custom-days" id="t1customDays">
+    <label><input type="checkbox" value="0" onchange="t1calculate()"> Sun</label>
+    <label><input type="checkbox" value="1" onchange="t1calculate()"> Mon</label>
+    <label><input type="checkbox" value="2" onchange="t1calculate()"> Tue</label>
+    <label><input type="checkbox" value="3" onchange="t1calculate()"> Wed</label>
+    <label><input type="checkbox" value="4" onchange="t1calculate()"> Thu</label>
+    <label><input type="checkbox" value="5" onchange="t1calculate()"> Fri</label>
+    <label><input type="checkbox" value="6" onchange="t1calculate()"> Sat</label>
+  </div>
 </div>
 
 <!-- TARGET -->
-<div class="section">
-<h3>Monthly Target</h3>
-<div class="grid-3">
-<input type="number" id="targetConv" placeholder="Target Conversions" oninput="calculate()">
-<input type="number" id="targetBudget" placeholder="Target Budget" oninput="calculate()">
-</div>
+<div class="t1-section">
+  <h3>Monthly Target</h3>
+  <div class="t1-grid-3">
+    <input type="number" id="targetConv" placeholder="Target Conversions" oninput="t1calculate()">
+    <input type="number" id="targetBudget" placeholder="Target Budget" oninput="t1calculate()">
+  </div>
 </div>
 
 <!-- KPI CARDS -->
-<div class="kpi-grid">
-
-<div class="kpi-card">
-<div class="kpi-title">Yesterday CPA</div>
-<div class="kpi-value" id="yCPA">₹0</div>
+<div class="t1-kpi-grid">
+  <div class="t1-kpi-card">
+    <div class="t1-kpi-title">Yesterday CPA</div>
+    <div class="t1-kpi-value" id="yCPA">₹0</div>
+  </div>
+  <div class="t1-kpi-card">
+    <div class="t1-kpi-title">Monthly CPA</div>
+    <div class="t1-kpi-value" id="mCPA">₹0</div>
+  </div>
+  <div class="t1-kpi-card">
+    <div class="t1-kpi-title">Conversion Rate</div>
+    <div class="t1-kpi-value" id="mCR">0%</div>
+  </div>
+  <div class="t1-kpi-card">
+    <div class="t1-kpi-title">Remaining Conversions</div>
+    <div class="t1-kpi-value" id="remainConv">0</div>
+  </div>
+  <div class="t1-kpi-card">
+    <div class="t1-kpi-title">Remaining Budget</div>
+    <div class="t1-kpi-value" id="remainBudget">₹0</div>
+  </div>
+  <div class="t1-kpi-card">
+    <div class="t1-kpi-title">Remaining Working Days</div>
+    <div class="t1-kpi-value" id="remainDays">0</div>
+  </div>
+  <div class="t1-kpi-card">
+    <div class="t1-kpi-title">Required Conv / Day</div>
+    <div class="t1-kpi-value" id="reqConvDay">0</div>
+  </div>
 </div>
 
-<div class="kpi-card">
-<div class="kpi-title">Monthly CPA</div>
-<div class="kpi-value" id="mCPA">₹0</div>
-</div>
-
-<div class="kpi-card">
-<div class="kpi-title">Conversion Rate</div>
-<div class="kpi-value" id="mCR">0%</div>
-</div>
-
-<div class="kpi-card">
-<div class="kpi-title">Remaining Conversions</div>
-<div class="kpi-value" id="remainConv">0</div>
-</div>
-
-<div class="kpi-card">
-<div class="kpi-title">Remaining Budget</div>
-<div class="kpi-value" id="remainBudget">₹0</div>
-</div>
-
-<div class="kpi-card">
-<div class="kpi-title">Remaining Working Days</div>
-<div class="kpi-value" id="remainDays">0</div>
-</div>
-
-<div class="kpi-card">
-<div class="kpi-title">Required Conv / Day</div>
-<div class="kpi-value" id="reqConvDay">0</div>
-</div>
-
-</div>
-
-<div class="footer">
-Smart insights for PPC marketers • Auto-updating dashboard
+<div class="t1-footer">
+  Smart insights for PPC marketers • Auto-updating dashboard
 </div>
 
 </div>
 </div>
+</div>
+</div>
 
+<!-- ══════════════════════════════════════════════════════════════════════
+     TOOL 2 — NegativeIQ
+═══════════════════════════════════════════════════════════════════════ -->
+<div id="tool2" class="tool-panel">
+<div class="shell">
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div>
+    <div class="brand">
+      <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
+      <div>
+        <div class="brand-name">NegativeIQ</div>
+        <div class="brand-sub">AI Keyword Analyzer · Groq</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API SETUP -->
+  <div class="s-section">
+    <div class="s-label">API Setup</div>
+    <div class="api-card">
+      <div class="api-card-title">
+        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        Free Groq API Key
+      </div>
+      <div class="api-steps">
+        <div class="api-step"><div class="sn">1</div><span>Go to <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a></span></div>
+        <div class="api-step"><div class="sn">2</div><span>Create free account → <strong style="color:#aaa">Create API Key</strong></span></div>
+        <div class="api-step"><div class="sn">3</div><span>Copy key (starts with <code style="color:var(--acc);font-size:10px;">gsk_</code>) and paste below</span></div>
+      </div>
+      <div class="key-row">
+        <input class="s-input" type="text" id="apiKeyInput" placeholder="gsk_..." style="font-size:12px;min-height:0;" />
+        <button class="btn-save-key" onclick="saveKey()">Save</button>
+      </div>
+      <div class="key-status" id="keyStatus"></div>
+    </div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="s-section">
+    <div class="s-label">Project Context</div>
+    <div class="s-field">
+      <div class="s-flabel">Company URL / Description</div>
+      <input class="s-input" type="text" id="companyUrl" placeholder="e.g. sagacitysolutions.co.uk" />
+    </div>
+    <div class="s-field">
+      <div class="s-flabel">Industry</div>
+      <select class="s-select" id="industry">
+        <option value="B2B SaaS and data technology">B2B SaaS / Data Tech</option>
+        <option value="IT consulting and bespoke software development">IT Consulting / Dev</option>
+        <option value="e-commerce and online retail">E-commerce / Retail</option>
+        <option value="digital marketing and analytics agency">Digital Marketing / Agency</option>
+        <option value="cloud infrastructure and DevOps services">Cloud / Infrastructure</option>
+        <option value="finance and fintech solutions">Finance / Fintech</option>
+        <option value="healthcare technology">Healthcare Tech</option>
+        <option value="general B2B professional services">General B2B</option>
+      </select>
+    </div>
+    <div class="s-field">
+      <div class="s-flabel">Exclusion Focus</div>
+      <select class="s-select" id="focus">
+        <option value="all types of irrelevant searches">All types (recommended)</option>
+        <option value="irrelevant intent and non-buyers only">Irrelevant intent only</option>
+        <option value="competitor brands and company names only">Competitors only</option>
+        <option value="navigational and URL searches only">URL / Nav only</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="s-section">
+    <div class="s-label">Search Terms</div>
+    <div class="s-field">
+      <div class="s-flabel">Paste terms (one per line)</div>
+      <textarea class="s-input" id="termsInput" placeholder="azure data engineering&#10;sagacity solutions&#10;phocas business intelligence&#10;https apps powerapps com&#10;daintta cheltenham&#10;hire data engineer london&#10;free analytics tool&#10;how to build dashboard"></textarea>
+      <div style="font-size:10.5px;color:#444;margin-top:4px;font-family:var(--fm);">📥 Ads → Search terms report → Download CSV</div>
+    </div>
+  </div>
+
+  <div class="s-section">
+    <div class="s-label">Always Exclude</div>
+    <div class="add-row">
+      <input class="s-input" type="text" id="custInput" placeholder="Competitor name..." onkeydown="if(event.key==='Enter')addCustom()" style="font-size:12px;min-height:0;" />
+      <button class="btn-add-tag" onclick="addCustom()">+ Add</button>
+    </div>
+    <div class="tag-wrap" id="tagWrap"></div>
+  </div>
+
+  <div class="s-section">
+    <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">
+      <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Analyze with Groq AI
+    </button>
+    <div class="load-section" id="loadSection">
+      <div class="spin-row">
+        <div class="spinner"></div>
+        <div class="load-label" id="loadMsg">Initializing...</div>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="load-sub" id="loadSub"></div>
+    </div>
+    <div class="err-inline" id="errBox"></div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- EMPTY STATE -->
+  <div id="emptyState" class="empty-state">
+    <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg></div>
+    <div class="empty-title">Ready to analyze</div>
+    <div class="empty-sub">Paste your Google Ads search terms in the sidebar, add your Groq API key, and click Analyze.</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-wrap fade-in" id="resultsWrap">
+
+    <div class="main-top">
+      <div class="main-title">
+        <h2>Analysis Results</h2>
+        <p id="resultSubtitle">— terms analyzed</p>
+      </div>
+      <div class="export-btns">
+        <button class="btn-export" onclick="copyConfirmed()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy List
+        </button>
+        <button class="btn-export primary" onclick="exportExcel()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h2.5l1.5 2.5 1.5-2.5H16l-2.5 3.5L16 22h-2.5L12 19.5 10.5 22H8l2.5-3.5L8 15zm0-5h8v1.5H8V10z"/></svg>
+          Download Excel (4 Sheets)
+        </button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card c-red">
+        <div class="stat-top"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div></div>
+        <div class="stat-num" id="sE">0</div><div class="stat-label">To Exclude</div>
+      </div>
+      <div class="stat-card c-grn">
+        <div class="stat-top"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div></div>
+        <div class="stat-num" id="sK">0</div><div class="stat-label">Kept Active</div>
+      </div>
+      <div class="stat-card c-blu">
+        <div class="stat-top"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></div></div>
+        <div class="stat-num" id="sT">0</div><div class="stat-label">Total Scanned</div>
+      </div>
+      <div class="stat-card c-amb">
+        <div class="stat-top"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div></div>
+        <div class="stat-num" id="sA">0</div><div class="stat-label">Needs Review</div>
+      </div>
+      <div class="stat-card c-pur">
+        <div class="stat-top"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div></div>
+        <div class="stat-num" id="sC">0</div><div class="stat-label">Competitors</div>
+      </div>
+      <div class="stat-card c-tel">
+        <div class="stat-top"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.987 7.987 0 0 1 5.08 16zm2.95-8H5.08a7.987 7.987 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg></div></div>
+        <div class="stat-num" id="sU">0</div><div class="stat-label">URL/Nav</div>
+      </div>
+    </div>
+
+    <div class="sum-card" id="sumBar"></div>
+    <div id="alertsEl"></div>
+
+    <!-- SPLIT PANELS -->
+    <div class="split">
+      <!-- EXCLUDE -->
+      <div class="panel">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-dot" style="background:var(--acc);"></div>
+            <div class="ph-title">Exclude</div>
+          </div>
+          <span class="ph-cnt" id="excCnt">0 terms</span>
+        </div>
+        <div class="tabs" id="excTabs"></div>
+        <div class="sbar">
+          <svg class="si" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Filter exclusions..." id="excSearch" oninput="renderExc()" />
+        </div>
+        <div class="pb"><div id="excList"></div></div>
+      </div>
+      <!-- KEEP -->
+      <div class="panel">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-dot" style="background:var(--green);"></div>
+            <div class="ph-title">Keeping Active</div>
+          </div>
+          <span class="ph-cnt" id="keptCnt">0 terms</span>
+        </div>
+        <div class="sbar">
+          <svg class="si" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Filter kept terms..." id="keptSearch" oninput="renderKept()" />
+        </div>
+        <div class="pb"><div id="keptList"></div></div>
+      </div>
+    </div>
+
+    <!-- COPY CARD -->
+    <div class="copy-card">
+      <div class="chead">
+        <div class="ctitle">Confirmed negative keywords — paste directly into Google Ads</div>
+        <div class="cbtns">
+          <button class="btn-sm" id="copyBtn" onclick="copyConfirmed()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+      </div>
+      <div class="cbox" id="copyBox"></div>
+    </div>
+
+    <button class="btn-reset" onclick="resetTool()">← New Analysis</button>
+  </div>
+</main>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT — Tool Switcher
+═══════════════════════════════════════════════════════════════════════ -->
 <script>
-
-function updateDateTime() {
-    let now = new Date();
-    document.getElementById("dateTime").innerText =
-        now.toLocaleDateString("en-IN", {weekday:'long', day:'numeric', month:'long', year:'numeric'}) +
-        " | " +
-        now.toLocaleTimeString();
+function switchTool(id, btn) {
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sw-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
 }
-setInterval(updateDateTime, 1000);
-updateDateTime();
+</script>
 
-function toggleCustomDays() {
-    let type = document.getElementById("workingType").value;
-    document.getElementById("customDays").style.display =
-        type === "custom" ? "block" : "none";
+<!-- ══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT — Tool 1: Google Ads Dashboard (all renamed with t1 prefix)
+═══════════════════════════════════════════════════════════════════════ -->
+<script>
+function t1updateDateTime() {
+  let now = new Date();
+  document.getElementById("t1dateTime").innerText =
+    now.toLocaleDateString("en-IN", {weekday:'long', day:'numeric', month:'long', year:'numeric'}) +
+    " | " +
+    now.toLocaleTimeString();
+}
+setInterval(t1updateDateTime, 1000);
+t1updateDateTime();
+
+function t1toggleCustomDays() {
+  let type = document.getElementById("workingType").value;
+  document.getElementById("t1customDays").style.display =
+    type === "custom" ? "block" : "none";
 }
 
-function calculate() {
+function t1calculate() {
+  let ySpend = parseFloat(document.getElementById("ySpend").value) || 0;
+  let yClicks = parseFloat(document.getElementById("yClicks").value) || 0;
+  let yConv = parseFloat(document.getElementById("yConv").value) || 0;
 
-let ySpend = parseFloat(document.getElementById("ySpend").value) || 0;
-let yClicks = parseFloat(document.getElementById("yClicks").value) || 0;
-let yConv = parseFloat(document.getElementById("yConv").value) || 0;
+  let mSpend = parseFloat(document.getElementById("mSpend").value) || 0;
+  let mClicks = parseFloat(document.getElementById("mClicks").value) || 0;
+  let mConv = parseFloat(document.getElementById("mConv").value) || 0;
 
-let mSpend = parseFloat(document.getElementById("mSpend").value) || 0;
-let mClicks = parseFloat(document.getElementById("mClicks").value) || 0;
-let mConv = parseFloat(document.getElementById("mConv").value) || 0;
+  let targetConv = parseFloat(document.getElementById("targetConv").value) || 0;
+  let targetBudget = parseFloat(document.getElementById("targetBudget").value) || 0;
 
-let targetConv = parseFloat(document.getElementById("targetConv").value) || 0;
-let targetBudget = parseFloat(document.getElementById("targetBudget").value) || 0;
+  let yCPA = yConv > 0 ? ySpend / yConv : 0;
+  let mCPA = mConv > 0 ? mSpend / mConv : 0;
+  let mCR = mClicks > 0 ? (mConv / mClicks) * 100 : 0;
 
-let yCPA = yConv > 0 ? ySpend / yConv : 0;
-let mCPA = mConv > 0 ? mSpend / mConv : 0;
-let mCR = mClicks > 0 ? (mConv / mClicks) * 100 : 0;
+  let remainingConv = targetConv - mConv;
+  let remainingBudget = targetBudget - mSpend;
 
-let remainingConv = targetConv - mConv;
-let remainingBudget = targetBudget - mSpend;
+  // WORKING DAYS
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = today.getMonth();
+  let currentDay = today.getDate();
+  let totalDays = new Date(year, month + 1, 0).getDate();
 
-// WORKING DAYS
-let today = new Date();
-let year = today.getFullYear();
-let month = today.getMonth();
-let currentDay = today.getDate();
-let totalDays = new Date(year, month + 1, 0).getDate();
+  let remainingDays = 0;
+  let type = document.getElementById("workingType").value;
 
-let remainingDays = 0;
-let type = document.getElementById("workingType").value;
-
-for (let d = currentDay + 1; d <= totalDays; d++) {
+  for (let d = currentDay + 1; d <= totalDays; d++) {
     let checkDate = new Date(year, month, d);
     let day = checkDate.getDay();
     let isWorking = true;
 
     if (type === "weekday") {
-        if (day === 0 || day === 6) isWorking = false;
+      if (day === 0 || day === 6) isWorking = false;
     }
 
     if (type === "custom") {
-        let selected = document.querySelectorAll('#customDays input:checked');
-        selected.forEach(cb => {
-            if (parseInt(cb.value) === day) isWorking = false;
-        });
+      let selected = document.querySelectorAll('#t1customDays input:checked');
+      selected.forEach(cb => {
+        if (parseInt(cb.value) === day) isWorking = false;
+      });
     }
 
     if (isWorking) remainingDays++;
+  }
+
+  let requiredConvPerDay = remainingDays > 0 ? remainingConv / remainingDays : 0;
+
+  // UPDATE UI
+  document.getElementById("yCPA").innerText = "₹" + yCPA.toFixed(2);
+  document.getElementById("mCPA").innerText = "₹" + mCPA.toFixed(2);
+  document.getElementById("mCR").innerText = mCR.toFixed(2) + "%";
+  document.getElementById("remainConv").innerText = remainingConv.toFixed(0);
+  document.getElementById("remainBudget").innerText = "₹" + remainingBudget.toFixed(2);
+  document.getElementById("remainDays").innerText = remainingDays;
+  document.getElementById("reqConvDay").innerText = requiredConvPerDay.toFixed(2);
+
+  if(remainingConv <= 0){
+    document.getElementById("remainConv").classList.add("t1-good");
+  } else {
+    document.getElementById("remainConv").classList.remove("t1-good");
+  }
+}
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT — Tool 2: NegativeIQ (original code, unchanged)
+═══════════════════════════════════════════════════════════════════════ -->
+<script>
+// ── RULE ENGINE ────────────────────────────────────────────────────────────
+const RX={
+  url:[/https?:\/\//i,/\bwww\./i,/\.com\b/i,/\.co\.uk\b/i,/\.io\b/i,/\.org\b/i,/\.net\b/i,/\bregister\b/i,/\bsign[\s-]?up\b/i,/\blogin\b/i,/\blog[\s-]?in\b/i,/\b\w{3,}\.\w{2,4}\/\w/i],
+  job:[/\bjobs?\b/i,/\bcareers?\b/i,/\bvacancy\b/i,/\bvacancies\b/i,/\bhiring\b/i,/\bsalary\b/i,/\bindeed\b/i,/\bglassdoor\b/i,/\brecruit/i,/\bapply\b/i,/\binterview\b/i,/\bcv\b/i,/\bresume\b/i,/\bentry[\s-]level\b/i,/\bhow\s+to\s+become\b/i,/\bcareer\s+path\b/i,/\broadmap\b/i,/\bwork\s+from\s+home\b/i,/\bremote\s+job\b/i],
+  free:[/\bfree\b/i,/\bopen[\s-]source\b/i,/\bdiy\b/i,/\bbuild[\s-]your[\s-]own\b/i,/\bcheap\b/i,/\bdiscount\b/i,/\bcoupon\b/i,/\bfree\s+download\b/i,/\bno[\s-]cost\b/i,/\bpirat/i],
+  info:[/\bhow\s+to\b/i,/\bwhat\s+is\b/i,/\bwhat\s+are\b/i,/\btutorial/i,/\bcourse\b/i,/\blearning?\b/i,/\bwiki\b/i,/\bdefinition\b/i,/\bmeaning\b/i,/\bexplained?\b/i,/\boverview\b/i,/\bguide\b/i,/\bpdf\b/i,/\byoutube\b/i,/\budemy\b/i,/\bcoursera\b/i,/\bbeginners?\b/i,/\bbasics\b/i,/\bdifference\s+between\b/i,/\bvs\b/i,/\bversus\b/i,/\bcompar/i,/\breddit\b/i,/\bquora\b/i,/\bforum\b/i,/\breview\b/i,/\balternative/i,/\bstep[\s-]by[\s-]step\b/i],
+  geo:[/\bnear\s+me\b/i,/\bin\s+my\s+area\b/i,/\bnearby\b/i,/\bdirections\b/i],
+  pos:[/\bhire\b/i,/\boutsorc/i,/\bconsult/i,/\bprovider\b/i,/\bsolution\b/i,/\bplatform\b/i,/\benterprise\b/i,/\bmanaged\b/i,/\bprofessional\b/i,/\bvendor\b/i,/\bpartner\b/i,/\bimplementat/i,/\bintegrat/i,/\bbespoke\b/i,/\bcustom\b/i]
+};
+function quickRule(t,brand,customs){
+  const tl=t.toLowerCase();
+  if(brand&&tl.includes(brand))return{exclude:false};
+  for(const c of customs)if(tl.includes(c))return{exclude:true,type:'competitor',reason:`Custom: "${c}"`,confidence:99,src:'rule'};
+  for(const p of RX.url)if(p.test(tl))return{exclude:true,type:'url_nav',reason:'Navigational/URL search',confidence:97,src:'rule'};
+  for(const p of RX.job)if(p.test(tl))return{exclude:true,type:'irrelevant',reason:'Job seeker — not a buyer',confidence:95,src:'rule'};
+  const hasPos=RX.pos.some(p=>p.test(tl));
+  for(const p of RX.free)if(p.test(tl)&&!hasPos)return{exclude:true,type:'low_intent',reason:'Free/DIY/cheap intent',confidence:93,src:'rule'};
+  for(const p of RX.info)if(p.test(tl)&&!hasPos)return{exclude:true,type:'irrelevant',reason:'Informational — not buying',confidence:90,src:'rule'};
+  for(const p of RX.geo)if(p.test(tl))return{exclude:true,type:'geography',reason:'Near-me / local search',confidence:88,src:'rule'};
+  return null;
 }
 
-let requiredConvPerDay = remainingDays > 0 ? remainingConv / remainingDays : 0;
+// ── STATE ──────────────────────────────────────────────────────────────────
+let apiKey=localStorage.getItem('groq_niq_key')||'';
+let customWords=[];
+let allExclusions=[],allKept=[],allTerms=[];
+let currentTab='all',tabDefs=[];
+const CHUNK=50;
 
-// UPDATE UI
-document.getElementById("yCPA").innerText = "₹" + yCPA.toFixed(2);
-document.getElementById("mCPA").innerText = "₹" + mCPA.toFixed(2);
-document.getElementById("mCR").innerText = mCR.toFixed(2) + "%";
-document.getElementById("remainConv").innerText = remainingConv.toFixed(0);
-document.getElementById("remainBudget").innerText = "₹" + remainingBudget.toFixed(2);
-document.getElementById("remainDays").innerText = remainingDays;
-document.getElementById("reqConvDay").innerText = requiredConvPerDay.toFixed(2);
+window.onload=()=>{
+  if(apiKey){document.getElementById('apiKeyInput').value=apiKey;setKS('✓ Key loaded — ready','ks-ok');}
+};
+function saveKey(){
+  const k=document.getElementById('apiKeyInput').value.trim();
+  if(!k||!k.startsWith('gsk_')){setKS('Invalid — must start with gsk_','ks-err');return;}
+  apiKey=k;localStorage.setItem('groq_niq_key',k);setKS('✓ Saved! Ready to analyze.','ks-ok');
+}
+function setKS(m,c){const el=document.getElementById('keyStatus');el.textContent=m;el.className='key-status '+c;}
 
-if(remainingConv <= 0){
-    document.getElementById("remainConv").classList.add("good");
-}else{
-    document.getElementById("remainConv").classList.remove("good");
+function addCustom(){
+  const inp=document.getElementById('custInput'),v=inp.value.trim();
+  if(!v||customWords.includes(v.toLowerCase())){inp.value='';return;}
+  customWords.push(v.toLowerCase());renderTags();inp.value='';
+}
+function removeCustom(w){customWords=customWords.filter(c=>c!==w);renderTags();}
+function renderTags(){
+  document.getElementById('tagWrap').innerHTML=customWords.map(w=>
+    `<div class="stag">${esc(w)}<span class="stag-x" onclick="removeCustom('${esc(w)}')">×</span></div>`
+  ).join('');
 }
 
+// ── ANALYSIS ───────────────────────────────────────────────────────────────
+async function runAnalysis(){
+  if(!apiKey){showErr('Please save your Groq API key first.');return;}
+  const raw=document.getElementById('termsInput').value.trim();
+  const url=document.getElementById('companyUrl').value.trim();
+  const industry=document.getElementById('industry').value;
+  const focus=document.getElementById('focus').value;
+  if(!raw){showErr('Please paste your search terms first.');return;}
+
+  allTerms=[...new Set(raw.split('\n').map(t=>t.trim()).filter(Boolean))];
+  allExclusions=[];allKept=[];
+
+  document.getElementById('analyzeBtn').disabled=true;
+  document.getElementById('errBox').classList.remove('show');
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('loadSection').classList.add('show');
+  setP(0);
+
+  const brand=url?url.replace(/https?:\/\//i,'').replace(/www\./i,'').split(/[./]/)[0].toLowerCase():'';
+
+  // Phase 1: Rules
+  setMsg('Running rule pre-filter...','');
+  const needsAI=[];
+  for(const term of allTerms){
+    const r=quickRule(term,brand,customWords);
+    if(r&&r.exclude)allExclusions.push({term,...r});
+    else if(r&&!r.exclude)allKept.push(term);
+    else needsAI.push(term);
+  }
+  setP(12);
+  setMsg(`${allExclusions.length+allKept.length} handled by rules`,`Sending ${needsAI.length} to Groq AI...`);
+  await sleep(150);
+
+  // Phase 2: Groq
+  if(needsAI.length>0){
+    const chunks=[];
+    for(let i=0;i<needsAI.length;i+=CHUNK)chunks.push(needsAI.slice(i,i+CHUNK));
+    const msgs=['Detecting unknown company names...','Analyzing intent with Llama 3.3-70B...','Checking competitor brand signals...','Flagging ambiguous proper nouns...','Verifying borderline terms...'];
+    let mi=0;
+    const iv=setInterval(()=>{mi=(mi+1)%msgs.length;setMsg(msgs[mi],chunks.length>1?`${needsAI.length} terms · ${chunks.length} batches`:'');},2000);
+    try{
+      for(let ci=0;ci<chunks.length;ci++){
+        setP(12+Math.round(((ci+1)/chunks.length)*83));
+        if(chunks.length>1)setMsg(msgs[mi%msgs.length],`Batch ${ci+1}/${chunks.length}`);
+        const res=await callGroq(chunks[ci],url,industry,focus,brand);
+        const seen=new Set();
+        for(const e of res.exclusions||[]){allExclusions.push({...e,src:'ai'});seen.add(e.term.toLowerCase());}
+        for(const k of res.kept||[]){allKept.push(k);seen.add(k.toLowerCase());}
+        for(const t of chunks[ci])if(!seen.has(t.toLowerCase()))allKept.push(t);
+        if(ci<chunks.length-1)await sleep(350);
+      }
+      clearInterval(iv);
+    }catch(err){
+      clearInterval(iv);
+      document.getElementById('loadSection').classList.remove('show');
+      document.getElementById('analyzeBtn').disabled=false;
+      let msg=err.message;
+      if(msg.includes('401')||msg.includes('invalid_api_key'))msg='Invalid API key. Go to console.groq.com/keys to get your key.';
+      else if(msg.includes('429'))msg='Rate limit hit. Wait 30 seconds and try again.';
+      showErr('Groq error: '+msg);
+      return;
+    }
+  }
+
+  setP(100);
+  await sleep(300);
+  document.getElementById('loadSection').classList.remove('show');
+  document.getElementById('analyzeBtn').disabled=false;
+  renderResults();
 }
 
+async function callGroq(terms,url,industry,focus,brand){
+  const urlCtx=url?`Advertiser: "${url}". Brand to protect: "${brand}". Never exclude their brand.`:'No URL given. Be conservative — mark uncertain as ambiguous.';
+  const sys=`You are an expert Google Ads PPC specialist for a ${industry} business.
+${urlCtx}
+Focus: ${focus}
+
+Types:
+- "irrelevant": job seekers, students, DIY, informational
+- "competitor": ANY company/brand/product name that is NOT the advertiser — even totally unknown ones. If it looks like a proper company name (e.g. "daintta cheltenham", "kybrix", "neozo gmbh"), flag it
+- "low_intent": free tool seekers, price shoppers, review hunters, comparison researchers  
+- "url_nav": URL-style searches, app names, website navigation searches
+- "ambiguous": proper nouns where you genuinely cannot tell if buyer or competitor
+- "geography": wrong location searches
+- "study": searches where someone is learning/researching the topic (not shopping) — e.g. "what is data engineering", "airflow tutorial"
+
+Confidence 0-100. Keep terms with genuine buying intent.
+Return ONLY raw JSON: {"exclusions":[{"term":"exact","type":"competitor","reason":"max 8 words","confidence":88}],"kept":["term1"]}`;
+
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',temperature:0.1,max_tokens:4096,messages:[{role:'system',content:sys},{role:'user',content:`Classify these ${terms.length} terms:\n${terms.join('\n')}`}]})
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||'HTTP '+res.status);}
+  const data=await res.json();
+  let raw=(data.choices?.[0]?.message?.content||'{}').trim().replace(/```json|```/g,'').trim();
+  try{return JSON.parse(raw);}catch(e){const m=raw.match(/\{[\s\S]*\}/);return m?JSON.parse(m[0]):{exclusions:[],kept:[]};}
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function renderResults(){
+  const ambC=allExclusions.filter(e=>e.type==='ambiguous').length;
+  const urlC=allExclusions.filter(e=>e.type==='url_nav').length;
+  const compC=allExclusions.filter(e=>e.type==='competitor').length;
+
+  document.getElementById('sT').textContent=allTerms.length;
+  document.getElementById('sE').textContent=allExclusions.length;
+  document.getElementById('sK').textContent=allKept.length;
+  document.getElementById('sC').textContent=compC;
+  document.getElementById('sU').textContent=urlC;
+  document.getElementById('sA').textContent=ambC;
+  document.getElementById('resultSubtitle').textContent=`${allTerms.length} terms analyzed`;
+
+  let s=`Scanned <strong>${allTerms.length} terms</strong> · Recommending <strong>${allExclusions.length} exclusions</strong> · <strong style="color:var(--green)">${allKept.length} kept active</strong>.`;
+  if(ambC>0)s+=` <span class="wt">⚠ ${ambC} ambiguous terms need manual review.</span>`;
+  document.getElementById('sumBar').innerHTML=s;
+
+  let alerts='';
+  if(ambC>0)alerts+=`<div class="alert al-amb">⚠ <strong>${ambC} ambiguous terms</strong> detected — possible competitor/brand names. Review in the "Ambiguous" tab before uploading to Google Ads.</div>`;
+  if(urlC>0)alerts+=`<div class="alert al-url">🔗 <strong>${urlC} navigational searches</strong> found — people looking for specific apps/websites, not your service.</div>`;
+  document.getElementById('alertsEl').innerHTML=alerts;
+
+  buildTabs();currentTab='all';
+  renderExc();renderKept();updateCopyBox();
+  document.getElementById('resultsWrap').classList.add('show');
+}
+
+function buildTabs(){
+  const defs=[{key:'all',label:'All'},{key:'competitor',label:'Competitors'},{key:'url_nav',label:'URL/Nav'},{key:'ambiguous',label:'Ambiguous'},{key:'irrelevant',label:'Irrelevant'},{key:'low_intent',label:'Low Intent'},{key:'study',label:'Study'},{key:'geography',label:'Geo'}];
+  tabDefs=defs.filter(d=>d.key==='all'||allExclusions.some(e=>e.type===d.key));
+  const el=document.getElementById('excTabs');el.innerHTML='';
+  tabDefs.forEach(d=>{
+    const cnt=d.key==='all'?allExclusions.length:allExclusions.filter(e=>e.type===d.key).length;
+    const btn=document.createElement('button');
+    btn.className='tab'+(d.key===currentTab?' active':'');
+    btn.innerHTML=d.label+`<span class="tn">${cnt}</span>`;
+    btn.onclick=()=>{currentTab=d.key;document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',tabDefs[i]&&tabDefs[i].key===d.key));renderExc();};
+    el.appendChild(btn);
+  });
+}
+
+const BDG={irrelevant:{c:'bi',l:'Irrelevant'},competitor:{c:'bc',l:'Competitor'},low_intent:{c:'bl',l:'Low Intent'},url_nav:{c:'bu',l:'URL/Nav'},ambiguous:{c:'ba',l:'Ambiguous'},geography:{c:'bge',l:'Geography'},study:{c:'bl',l:'Study'}};
+
+function renderExc(){
+  const q=document.getElementById('excSearch').value.toLowerCase();
+  let items=currentTab==='all'?allExclusions:allExclusions.filter(e=>e.type===currentTab);
+  if(q)items=items.filter(e=>e.term.toLowerCase().includes(q));
+  document.getElementById('excCnt').textContent=allExclusions.length+' terms';
+  const el=document.getElementById('excList');
+  if(!items.length){el.innerHTML='<div class="list-empty">No terms in this category</div>';return;}
+  el.innerHTML=items.map(e=>{
+    const bd=BDG[e.type]||{c:'ba',l:'Review'};
+    const conf=e.confidence||75;
+    const cc=conf>=80?'chi':conf>=60?'cmd':'clo';
+    const hl=e.type==='ambiguous'?' hl-amb':e.type==='url_nav'?' hl-url':'';
+    const sp=e.src==='ai'?'<span class="src-pill sp-ai">AI</span>':'<span class="src-pill sp-rule">rule</span>';
+    return `<div class="kw-item${hl}">
+      <div class="kwr1"><span class="kwt" title="${esc(e.term)}">${esc(e.term)}</span>${sp}<span class="bdg ${bd.c}">${bd.l}</span></div>
+      <div class="kw-reason">${esc(e.reason||'')}</div>
+      <div class="conf-row"><span class="ctxt">${conf}%</span><div class="cbar"><div class="cfill ${cc}" style="width:${conf}%"></div></div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderKept(){
+  const q=document.getElementById('keptSearch').value.toLowerCase();
+  const items=q?allKept.filter(t=>t.toLowerCase().includes(q)):allKept;
+  document.getElementById('keptCnt').textContent=allKept.length+' terms';
+  const el=document.getElementById('keptList');
+  if(!items.length){el.innerHTML='<div class="list-empty">No kept terms</div>';return;}
+  el.innerHTML=items.map(t=>`<div class="kept-item"><div class="ktick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><span class="kterm">${esc(t)}</span></div>`).join('');
+}
+
+function updateCopyBox(){
+  const lines=allExclusions.filter(e=>e.type!=='ambiguous').map(e=>e.term);
+  document.getElementById('copyBox').textContent=lines.length?lines.join('\n'):'No confirmed exclusions.';
+}
+
+function copyConfirmed(){
+  navigator.clipboard.writeText(document.getElementById('copyBox').textContent).then(()=>{
+    const b=document.getElementById('copyBtn');b.textContent='✓ Copied!';b.classList.add('ok');
+    setTimeout(()=>{b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';b.classList.remove('ok');},2500);
+  });
+}
+
+// ── EXCEL EXPORT (4 SHEETS) ────────────────────────────────────────────────
+function exportExcel(){
+  if(!allExclusions.length&&!allKept.length){alert('No results to export yet. Run an analysis first.');return;}
+
+  const wb=XLSX.utils.book_new();
+
+  function makeSheet(data){return XLSX.utils.aoa_to_sheet(data);}
+
+  const allNeg=allExclusions.filter(e=>e.type!=='ambiguous');
+  const s1=[['All Negative Keywords'],['Generated by NegativeIQ · '+new Date().toLocaleDateString()],[''],
+    ['Search Term','Category','Reason','Confidence %','Detected By']
+  ];
+  allNeg.forEach(e=>s1.push([e.term, capType(e.type), e.reason||'', e.confidence||'', e.src==='ai'?'Groq AI':'Rule Engine']));
+  s1.push([''],['Total:',allNeg.length,'negative keywords']);
+  const ws1=makeSheet(s1);
+  ws1['!cols']=[{wch:40},{wch:16},{wch:45},{wch:14},{wch:14}];
+  ws1['!merges']=[{s:{r:0,c:0},e:{r:0,c:4}}];
+  XLSX.utils.book_append_sheet(wb,ws1,'All Negative Keywords');
+
+  const companies=allExclusions.filter(e=>e.type==='competitor'||e.type==='ambiguous');
+  const s2=[['Company Names'],['Competitor brands and company name searches'],[''],
+    ['Search Term','Status','Reason','Confidence %','Action Required']
+  ];
+  companies.forEach(e=>s2.push([e.term, e.type==='ambiguous'?'NEEDS REVIEW':'COMPETITOR', e.reason||'', e.confidence||'', e.type==='ambiguous'?'Manually verify before excluding':'Add as negative keyword']));
+  s2.push([''],['Total:',companies.length,'company/brand terms found']);
+  const ws2=makeSheet(s2);
+  ws2['!cols']=[{wch:40},{wch:16},{wch:45},{wch:14},{wch:32}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Company Names');
+
+  const infoStudy=allExclusions.filter(e=>e.type==='irrelevant'||e.type==='study');
+  const s3=[['Informational Search Terms'],['Study / research purpose searches — not buying intent'],[''],
+    ['Search Term','Sub-Type','Reason','Confidence %','Why Exclude']
+  ];
+  infoStudy.forEach(e=>s3.push([e.term, e.type==='study'?'Study/Research':'Irrelevant Intent', e.reason||'', e.confidence||'', 'User is learning, not shopping — no commercial intent']));
+  s3.push([''],['Total:',infoStudy.length,'informational/study terms']);
+  const ws3=makeSheet(s3);
+  ws3['!cols']=[{wch:40},{wch:18},{wch:45},{wch:14},{wch:45}];
+  XLSX.utils.book_append_sheet(wb,ws3,'Study Purpose Terms');
+
+  const s4=[['Related Search Terms'],['These terms are KEPT ACTIVE — relevant buying intent searches'],[''],
+    ['Search Term','Status','Notes']
+  ];
+  allKept.forEach(t=>s4.push([t,'ACTIVE','Relevant — keep running ads on this term']));
+  const others=allExclusions.filter(e=>e.type==='low_intent'||e.type==='geography'||e.type==='url_nav');
+  if(others.length){
+    s4.push([''],['Other Excluded Terms (Low Intent / URL / Geography)','','']);
+    s4.push(['Search Term','Category','Reason']);
+    others.forEach(e=>s4.push([e.term,capType(e.type),e.reason||'']));
+  }
+  s4.push([''],['Active terms:',allKept.length,''],['Other excluded:',others.length,'']);
+  const ws4=makeSheet(s4);
+  ws4['!cols']=[{wch:40},{wch:16},{wch:50}];
+  XLSX.utils.book_append_sheet(wb,ws4,'Related Search Terms');
+
+  const date=new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb,`NegativeIQ_Keywords_${date}.xlsx`);
+}
+
+function capType(t){return({irrelevant:'Irrelevant Intent',competitor:'Competitor Brand',low_intent:'Low Intent',url_nav:'URL/Navigational',ambiguous:'Ambiguous',geography:'Geography',study:'Study/Research'}[t])||t;}
+
+function resetTool(){
+  document.getElementById('termsInput').value='';
+  document.getElementById('companyUrl').value='';
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('emptyState').style.display='flex';
+  document.getElementById('errBox').classList.remove('show');
+  document.getElementById('analyzeBtn').disabled=false;
+  allExclusions=[];allKept=[];allTerms=[];
+}
+
+function setP(v){document.getElementById('progFill').style.width=v+'%';}
+function setMsg(m,s){document.getElementById('loadMsg').textContent=m;document.getElementById('loadSub').textContent=s||'';}
+function showErr(m){const el=document.getElementById('errBox');el.textContent=m;el.classList.add('show');}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
 
 </body>
