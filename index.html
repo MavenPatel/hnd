@@ -72,11 +72,8 @@
 /* ═══════════════════════════════════════════════════════════════════════
    TOOL 1 — Google Ads Smart Dashboard
 ═══════════════════════════════════════════════════════════════════════ */
-#tool1 body-equiv,
 .t1-root {
   display: block;
-}
-.t1-root {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #1a73e8, #4e73df, #6f42c1);
@@ -181,6 +178,21 @@
 
 .t1-kpi-card:hover {
   transform: translateY(-6px);
+}
+
+/* ── NEW: highlight card for Daily Budget ── */
+.t1-kpi-card.t1-highlight {
+  background: linear-gradient(135deg, #1a73e8 0%, #4e73df 100%);
+  color: #fff;
+  box-shadow: 0 15px 30px rgba(26,115,232,0.35);
+}
+
+.t1-kpi-card.t1-highlight .t1-kpi-title {
+  color: rgba(255,255,255,0.82);
+}
+
+.t1-kpi-card.t1-highlight .t1-kpi-value {
+  color: #fff;
 }
 
 .t1-kpi-title {
@@ -486,7 +498,7 @@
   <h3>Campaign Working Days</h3>
   <select id="workingType" onchange="t1toggleCustomDays(); t1calculate();">
     <option value="all">Runs Everyday</option>
-    <option value="weekday">Off Saturday & Sunday</option>
+    <option value="weekday">Off Saturday &amp; Sunday</option>
     <option value="custom">Custom Off Days</option>
   </select>
   <div class="t1-custom-days" id="t1customDays">
@@ -539,6 +551,13 @@
     <div class="t1-kpi-title">Required Conv / Day</div>
     <div class="t1-kpi-value" id="reqConvDay">0</div>
   </div>
+
+  <!-- ══ NEW CARD: Daily Budget to Spend ══ -->
+  <div class="t1-kpi-card t1-highlight">
+    <div class="t1-kpi-title">Daily Budget to Spend</div>
+    <div class="t1-kpi-value" id="dailyBudget">₹0</div>
+  </div>
+
 </div>
 
 <div class="t1-footer">
@@ -765,7 +784,7 @@
       <div class="cbox" id="copyBox"></div>
     </div>
 
-    <button class="btn-reset" onclick="resetTool()">← New Analysis</button>
+    <button class="btn-reset" onclick="resetTool()">&#8592; New Analysis</button>
   </div>
 </main>
 </div>
@@ -776,19 +795,19 @@
 ═══════════════════════════════════════════════════════════════════════ -->
 <script>
 function switchTool(id, btn) {
-  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sw-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tool-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.sw-tab').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
 }
 </script>
 
 <!-- ══════════════════════════════════════════════════════════════════════
-     JAVASCRIPT — Tool 1: Google Ads Dashboard (all renamed with t1 prefix)
+     JAVASCRIPT — Tool 1: Google Ads Dashboard
 ═══════════════════════════════════════════════════════════════════════ -->
 <script>
 function t1updateDateTime() {
-  let now = new Date();
+  var now = new Date();
   document.getElementById("t1dateTime").innerText =
     now.toLocaleDateString("en-IN", {weekday:'long', day:'numeric', month:'long', year:'numeric'}) +
     " | " +
@@ -798,52 +817,52 @@ setInterval(t1updateDateTime, 1000);
 t1updateDateTime();
 
 function t1toggleCustomDays() {
-  let type = document.getElementById("workingType").value;
+  var type = document.getElementById("workingType").value;
   document.getElementById("t1customDays").style.display =
     type === "custom" ? "block" : "none";
 }
 
 function t1calculate() {
-  let ySpend = parseFloat(document.getElementById("ySpend").value) || 0;
-  let yClicks = parseFloat(document.getElementById("yClicks").value) || 0;
-  let yConv = parseFloat(document.getElementById("yConv").value) || 0;
+  var ySpend  = parseFloat(document.getElementById("ySpend").value)  || 0;
+  var yClicks = parseFloat(document.getElementById("yClicks").value) || 0;
+  var yConv   = parseFloat(document.getElementById("yConv").value)   || 0;
 
-  let mSpend = parseFloat(document.getElementById("mSpend").value) || 0;
-  let mClicks = parseFloat(document.getElementById("mClicks").value) || 0;
-  let mConv = parseFloat(document.getElementById("mConv").value) || 0;
+  var mSpend  = parseFloat(document.getElementById("mSpend").value)  || 0;
+  var mClicks = parseFloat(document.getElementById("mClicks").value) || 0;
+  var mConv   = parseFloat(document.getElementById("mConv").value)   || 0;
 
-  let targetConv = parseFloat(document.getElementById("targetConv").value) || 0;
-  let targetBudget = parseFloat(document.getElementById("targetBudget").value) || 0;
+  var targetConv   = parseFloat(document.getElementById("targetConv").value)   || 0;
+  var targetBudget = parseFloat(document.getElementById("targetBudget").value) || 0;
 
-  let yCPA = yConv > 0 ? ySpend / yConv : 0;
-  let mCPA = mConv > 0 ? mSpend / mConv : 0;
-  let mCR = mClicks > 0 ? (mConv / mClicks) * 100 : 0;
+  // ── KPI calculations ──────────────────────────────────────────────────
+  var yCPA = yConv   > 0 ? ySpend / yConv   : 0;
+  var mCPA = mConv   > 0 ? mSpend / mConv   : 0;
+  var mCR  = mClicks > 0 ? (mConv / mClicks) * 100 : 0;
 
-  let remainingConv = targetConv - mConv;
-  let remainingBudget = targetBudget - mSpend;
+  var remainingConv   = targetConv   - mConv;
+  var remainingBudget = targetBudget - mSpend;
 
-  // WORKING DAYS
-  let today = new Date();
-  let year = today.getFullYear();
-  let month = today.getMonth();
-  let currentDay = today.getDate();
-  let totalDays = new Date(year, month + 1, 0).getDate();
+  // ── Working days remaining ────────────────────────────────────────────
+  var today       = new Date();
+  var year        = today.getFullYear();
+  var month       = today.getMonth();
+  var currentDay  = today.getDate();
+  var totalDays   = new Date(year, month + 1, 0).getDate();
+  var remainingDays = 0;
+  var type = document.getElementById("workingType").value;
 
-  let remainingDays = 0;
-  let type = document.getElementById("workingType").value;
-
-  for (let d = currentDay + 1; d <= totalDays; d++) {
-    let checkDate = new Date(year, month, d);
-    let day = checkDate.getDay();
-    let isWorking = true;
+  for (var d = currentDay + 1; d <= totalDays; d++) {
+    var checkDate  = new Date(year, month, d);
+    var day        = checkDate.getDay();
+    var isWorking  = true;
 
     if (type === "weekday") {
       if (day === 0 || day === 6) isWorking = false;
     }
 
     if (type === "custom") {
-      let selected = document.querySelectorAll('#t1customDays input:checked');
-      selected.forEach(cb => {
+      var selected = document.querySelectorAll('#t1customDays input:checked');
+      selected.forEach(function(cb) {
         if (parseInt(cb.value) === day) isWorking = false;
       });
     }
@@ -851,141 +870,169 @@ function t1calculate() {
     if (isWorking) remainingDays++;
   }
 
-  let requiredConvPerDay = remainingDays > 0 ? remainingConv / remainingDays : 0;
+  var requiredConvPerDay = remainingDays > 0 ? remainingConv / remainingDays : 0;
 
-  // UPDATE UI
-  document.getElementById("yCPA").innerText = "₹" + yCPA.toFixed(2);
-  document.getElementById("mCPA").innerText = "₹" + mCPA.toFixed(2);
-  document.getElementById("mCR").innerText = mCR.toFixed(2) + "%";
-  document.getElementById("remainConv").innerText = remainingConv.toFixed(0);
-  document.getElementById("remainBudget").innerText = "₹" + remainingBudget.toFixed(2);
-  document.getElementById("remainDays").innerText = remainingDays;
-  document.getElementById("reqConvDay").innerText = requiredConvPerDay.toFixed(2);
+  // ── NEW: Daily Budget to Spend = Remaining Budget / Remaining Days ────
+  var dailyBudgetToSpend = remainingDays > 0 ? remainingBudget / remainingDays : 0;
 
-  if(remainingConv <= 0){
-    document.getElementById("remainConv").classList.add("t1-good");
+  // ── Update UI ─────────────────────────────────────────────────────────
+  document.getElementById("yCPA").innerText        = "₹" + yCPA.toFixed(2);
+  document.getElementById("mCPA").innerText        = "₹" + mCPA.toFixed(2);
+  document.getElementById("mCR").innerText         = mCR.toFixed(2) + "%";
+  document.getElementById("remainConv").innerText  = remainingConv.toFixed(0);
+  document.getElementById("remainBudget").innerText= "₹" + remainingBudget.toFixed(2);
+  document.getElementById("remainDays").innerText  = remainingDays;
+  document.getElementById("reqConvDay").innerText  = requiredConvPerDay.toFixed(2);
+  document.getElementById("dailyBudget").innerText = "₹" + dailyBudgetToSpend.toFixed(2);
+
+  // colour remaining conversions green when target is met
+  var remConvEl = document.getElementById("remainConv");
+  if (remainingConv <= 0) {
+    remConvEl.classList.add("t1-good");
   } else {
-    document.getElementById("remainConv").classList.remove("t1-good");
+    remConvEl.classList.remove("t1-good");
   }
 }
 </script>
 
 <!-- ══════════════════════════════════════════════════════════════════════
-     JAVASCRIPT — Tool 2: NegativeIQ (original code, unchanged)
+     JAVASCRIPT — Tool 2: NegativeIQ
 ═══════════════════════════════════════════════════════════════════════ -->
 <script>
 // ── RULE ENGINE ────────────────────────────────────────────────────────────
-const RX={
-  url:[/https?:\/\//i,/\bwww\./i,/\.com\b/i,/\.co\.uk\b/i,/\.io\b/i,/\.org\b/i,/\.net\b/i,/\bregister\b/i,/\bsign[\s-]?up\b/i,/\blogin\b/i,/\blog[\s-]?in\b/i,/\b\w{3,}\.\w{2,4}\/\w/i],
-  job:[/\bjobs?\b/i,/\bcareers?\b/i,/\bvacancy\b/i,/\bvacancies\b/i,/\bhiring\b/i,/\bsalary\b/i,/\bindeed\b/i,/\bglassdoor\b/i,/\brecruit/i,/\bapply\b/i,/\binterview\b/i,/\bcv\b/i,/\bresume\b/i,/\bentry[\s-]level\b/i,/\bhow\s+to\s+become\b/i,/\bcareer\s+path\b/i,/\broadmap\b/i,/\bwork\s+from\s+home\b/i,/\bremote\s+job\b/i],
-  free:[/\bfree\b/i,/\bopen[\s-]source\b/i,/\bdiy\b/i,/\bbuild[\s-]your[\s-]own\b/i,/\bcheap\b/i,/\bdiscount\b/i,/\bcoupon\b/i,/\bfree\s+download\b/i,/\bno[\s-]cost\b/i,/\bpirat/i],
-  info:[/\bhow\s+to\b/i,/\bwhat\s+is\b/i,/\bwhat\s+are\b/i,/\btutorial/i,/\bcourse\b/i,/\blearning?\b/i,/\bwiki\b/i,/\bdefinition\b/i,/\bmeaning\b/i,/\bexplained?\b/i,/\boverview\b/i,/\bguide\b/i,/\bpdf\b/i,/\byoutube\b/i,/\budemy\b/i,/\bcoursera\b/i,/\bbeginners?\b/i,/\bbasics\b/i,/\bdifference\s+between\b/i,/\bvs\b/i,/\bversus\b/i,/\bcompar/i,/\breddit\b/i,/\bquora\b/i,/\bforum\b/i,/\breview\b/i,/\balternative/i,/\bstep[\s-]by[\s-]step\b/i],
-  geo:[/\bnear\s+me\b/i,/\bin\s+my\s+area\b/i,/\bnearby\b/i,/\bdirections\b/i],
-  pos:[/\bhire\b/i,/\boutsorc/i,/\bconsult/i,/\bprovider\b/i,/\bsolution\b/i,/\bplatform\b/i,/\benterprise\b/i,/\bmanaged\b/i,/\bprofessional\b/i,/\bvendor\b/i,/\bpartner\b/i,/\bimplementat/i,/\bintegrat/i,/\bbespoke\b/i,/\bcustom\b/i]
+var RX = {
+  url:  [/https?:\/\//i,/\bwww\./i,/\.com\b/i,/\.co\.uk\b/i,/\.io\b/i,/\.org\b/i,/\.net\b/i,/\bregister\b/i,/\bsign[\s-]?up\b/i,/\blogin\b/i,/\blog[\s-]?in\b/i,/\b\w{3,}\.\w{2,4}\/\w/i],
+  job:  [/\bjobs?\b/i,/\bcareers?\b/i,/\bvacancy\b/i,/\bvacancies\b/i,/\bhiring\b/i,/\bsalary\b/i,/\bindeed\b/i,/\bglassdoor\b/i,/\brecruit/i,/\bapply\b/i,/\binterview\b/i,/\bcv\b/i,/\bresume\b/i,/\bentry[\s-]level\b/i,/\bhow\s+to\s+become\b/i,/\bcareer\s+path\b/i,/\broadmap\b/i,/\bwork\s+from\s+home\b/i,/\bremote\s+job\b/i],
+  free: [/\bfree\b/i,/\bopen[\s-]source\b/i,/\bdiy\b/i,/\bbuild[\s-]your[\s-]own\b/i,/\bcheap\b/i,/\bdiscount\b/i,/\bcoupon\b/i,/\bfree\s+download\b/i,/\bno[\s-]cost\b/i,/\bpirat/i],
+  info: [/\bhow\s+to\b/i,/\bwhat\s+is\b/i,/\bwhat\s+are\b/i,/\btutorial/i,/\bcourse\b/i,/\blearning?\b/i,/\bwiki\b/i,/\bdefinition\b/i,/\bmeaning\b/i,/\bexplained?\b/i,/\boverview\b/i,/\bguide\b/i,/\bpdf\b/i,/\byoutube\b/i,/\budemy\b/i,/\bcoursera\b/i,/\bbeginners?\b/i,/\bbasics\b/i,/\bdifference\s+between\b/i,/\bvs\b/i,/\bversus\b/i,/\bcompar/i,/\breddit\b/i,/\bquora\b/i,/\bforum\b/i,/\breview\b/i,/\balternative/i,/\bstep[\s-]by[\s-]step\b/i],
+  geo:  [/\bnear\s+me\b/i,/\bin\s+my\s+area\b/i,/\bnearby\b/i,/\bdirections\b/i],
+  pos:  [/\bhire\b/i,/\boutsorc/i,/\bconsult/i,/\bprovider\b/i,/\bsolution\b/i,/\bplatform\b/i,/\benterprise\b/i,/\bmanaged\b/i,/\bprofessional\b/i,/\bvendor\b/i,/\bpartner\b/i,/\bimplementat/i,/\bintegrat/i,/\bbespoke\b/i,/\bcustom\b/i]
 };
-function quickRule(t,brand,customs){
-  const tl=t.toLowerCase();
-  if(brand&&tl.includes(brand))return{exclude:false};
-  for(const c of customs)if(tl.includes(c))return{exclude:true,type:'competitor',reason:`Custom: "${c}"`,confidence:99,src:'rule'};
-  for(const p of RX.url)if(p.test(tl))return{exclude:true,type:'url_nav',reason:'Navigational/URL search',confidence:97,src:'rule'};
-  for(const p of RX.job)if(p.test(tl))return{exclude:true,type:'irrelevant',reason:'Job seeker — not a buyer',confidence:95,src:'rule'};
-  const hasPos=RX.pos.some(p=>p.test(tl));
-  for(const p of RX.free)if(p.test(tl)&&!hasPos)return{exclude:true,type:'low_intent',reason:'Free/DIY/cheap intent',confidence:93,src:'rule'};
-  for(const p of RX.info)if(p.test(tl)&&!hasPos)return{exclude:true,type:'irrelevant',reason:'Informational — not buying',confidence:90,src:'rule'};
-  for(const p of RX.geo)if(p.test(tl))return{exclude:true,type:'geography',reason:'Near-me / local search',confidence:88,src:'rule'};
+
+function quickRule(t, brand, customs) {
+  var tl = t.toLowerCase();
+  if (brand && tl.includes(brand)) return { exclude: false };
+  for (var i = 0; i < customs.length; i++) {
+    if (tl.includes(customs[i])) return { exclude: true, type: 'competitor', reason: 'Custom: "' + customs[i] + '"', confidence: 99, src: 'rule' };
+  }
+  for (var i = 0; i < RX.url.length; i++)  if (RX.url[i].test(tl))  return { exclude: true, type: 'url_nav',    reason: 'Navigational/URL search',     confidence: 97, src: 'rule' };
+  for (var i = 0; i < RX.job.length; i++)  if (RX.job[i].test(tl))  return { exclude: true, type: 'irrelevant', reason: 'Job seeker — not a buyer',     confidence: 95, src: 'rule' };
+  var hasPos = RX.pos.some(function(p) { return p.test(tl); });
+  for (var i = 0; i < RX.free.length; i++) if (RX.free[i].test(tl) && !hasPos) return { exclude: true, type: 'low_intent', reason: 'Free/DIY/cheap intent', confidence: 93, src: 'rule' };
+  for (var i = 0; i < RX.info.length; i++) if (RX.info[i].test(tl) && !hasPos) return { exclude: true, type: 'irrelevant', reason: 'Informational — not buying', confidence: 90, src: 'rule' };
+  for (var i = 0; i < RX.geo.length; i++)  if (RX.geo[i].test(tl))  return { exclude: true, type: 'geography', reason: 'Near-me / local search', confidence: 88, src: 'rule' };
   return null;
 }
 
 // ── STATE ──────────────────────────────────────────────────────────────────
-let apiKey=localStorage.getItem('groq_niq_key')||'';
-let customWords=[];
-let allExclusions=[],allKept=[],allTerms=[];
-let currentTab='all',tabDefs=[];
-const CHUNK=50;
+var apiKey = localStorage.getItem('groq_niq_key') || '';
+var customWords = [];
+var allExclusions = [], allKept = [], allTerms = [];
+var currentTab = 'all', tabDefs = [];
+var CHUNK = 50;
 
-window.onload=()=>{
-  if(apiKey){document.getElementById('apiKeyInput').value=apiKey;setKS('✓ Key loaded — ready','ks-ok');}
+window.onload = function() {
+  if (apiKey) {
+    document.getElementById('apiKeyInput').value = apiKey;
+    setKS('✓ Key loaded — ready', 'ks-ok');
+  }
 };
-function saveKey(){
-  const k=document.getElementById('apiKeyInput').value.trim();
-  if(!k||!k.startsWith('gsk_')){setKS('Invalid — must start with gsk_','ks-err');return;}
-  apiKey=k;localStorage.setItem('groq_niq_key',k);setKS('✓ Saved! Ready to analyze.','ks-ok');
-}
-function setKS(m,c){const el=document.getElementById('keyStatus');el.textContent=m;el.className='key-status '+c;}
 
-function addCustom(){
-  const inp=document.getElementById('custInput'),v=inp.value.trim();
-  if(!v||customWords.includes(v.toLowerCase())){inp.value='';return;}
-  customWords.push(v.toLowerCase());renderTags();inp.value='';
+function saveKey() {
+  var k = document.getElementById('apiKeyInput').value.trim();
+  if (!k || !k.startsWith('gsk_')) { setKS('Invalid — must start with gsk_', 'ks-err'); return; }
+  apiKey = k;
+  localStorage.setItem('groq_niq_key', k);
+  setKS('✓ Saved! Ready to analyze.', 'ks-ok');
 }
-function removeCustom(w){customWords=customWords.filter(c=>c!==w);renderTags();}
-function renderTags(){
-  document.getElementById('tagWrap').innerHTML=customWords.map(w=>
-    `<div class="stag">${esc(w)}<span class="stag-x" onclick="removeCustom('${esc(w)}')">×</span></div>`
-  ).join('');
+
+function setKS(m, c) {
+  var el = document.getElementById('keyStatus');
+  el.textContent = m;
+  el.className = 'key-status ' + c;
+}
+
+function addCustom() {
+  var inp = document.getElementById('custInput');
+  var v = inp.value.trim();
+  if (!v || customWords.includes(v.toLowerCase())) { inp.value = ''; return; }
+  customWords.push(v.toLowerCase());
+  renderTags();
+  inp.value = '';
+}
+
+function removeCustom(w) {
+  customWords = customWords.filter(function(c) { return c !== w; });
+  renderTags();
+}
+
+function renderTags() {
+  document.getElementById('tagWrap').innerHTML = customWords.map(function(w) {
+    return '<div class="stag">' + esc(w) + '<span class="stag-x" onclick="removeCustom(\'' + esc(w) + '\')">\xD7</span></div>';
+  }).join('');
 }
 
 // ── ANALYSIS ───────────────────────────────────────────────────────────────
-async function runAnalysis(){
-  if(!apiKey){showErr('Please save your Groq API key first.');return;}
-  const raw=document.getElementById('termsInput').value.trim();
-  const url=document.getElementById('companyUrl').value.trim();
-  const industry=document.getElementById('industry').value;
-  const focus=document.getElementById('focus').value;
-  if(!raw){showErr('Please paste your search terms first.');return;}
+async function runAnalysis() {
+  if (!apiKey) { showErr('Please save your Groq API key first.'); return; }
+  var raw      = document.getElementById('termsInput').value.trim();
+  var url      = document.getElementById('companyUrl').value.trim();
+  var industry = document.getElementById('industry').value;
+  var focus    = document.getElementById('focus').value;
+  if (!raw) { showErr('Please paste your search terms first.'); return; }
 
-  allTerms=[...new Set(raw.split('\n').map(t=>t.trim()).filter(Boolean))];
-  allExclusions=[];allKept=[];
+  allTerms = Array.from(new Set(raw.split('\n').map(function(t) { return t.trim(); }).filter(Boolean)));
+  allExclusions = []; allKept = [];
 
-  document.getElementById('analyzeBtn').disabled=true;
+  document.getElementById('analyzeBtn').disabled = true;
   document.getElementById('errBox').classList.remove('show');
   document.getElementById('resultsWrap').classList.remove('show');
-  document.getElementById('emptyState').style.display='none';
+  document.getElementById('emptyState').style.display = 'none';
   document.getElementById('loadSection').classList.add('show');
   setP(0);
 
-  const brand=url?url.replace(/https?:\/\//i,'').replace(/www\./i,'').split(/[./]/)[0].toLowerCase():'';
+  var brand = url ? url.replace(/https?:\/\//i,'').replace(/www\./i,'').split(/[./]/)[0].toLowerCase() : '';
 
   // Phase 1: Rules
-  setMsg('Running rule pre-filter...','');
-  const needsAI=[];
-  for(const term of allTerms){
-    const r=quickRule(term,brand,customWords);
-    if(r&&r.exclude)allExclusions.push({term,...r});
-    else if(r&&!r.exclude)allKept.push(term);
-    else needsAI.push(term);
+  setMsg('Running rule pre-filter...', '');
+  var needsAI = [];
+  for (var i = 0; i < allTerms.length; i++) {
+    var r = quickRule(allTerms[i], brand, customWords);
+    if (r && r.exclude)  allExclusions.push(Object.assign({ term: allTerms[i] }, r));
+    else if (r && !r.exclude) allKept.push(allTerms[i]);
+    else needsAI.push(allTerms[i]);
   }
   setP(12);
-  setMsg(`${allExclusions.length+allKept.length} handled by rules`,`Sending ${needsAI.length} to Groq AI...`);
+  setMsg((allExclusions.length + allKept.length) + ' handled by rules', 'Sending ' + needsAI.length + ' to Groq AI...');
   await sleep(150);
 
   // Phase 2: Groq
-  if(needsAI.length>0){
-    const chunks=[];
-    for(let i=0;i<needsAI.length;i+=CHUNK)chunks.push(needsAI.slice(i,i+CHUNK));
-    const msgs=['Detecting unknown company names...','Analyzing intent with Llama 3.3-70B...','Checking competitor brand signals...','Flagging ambiguous proper nouns...','Verifying borderline terms...'];
-    let mi=0;
-    const iv=setInterval(()=>{mi=(mi+1)%msgs.length;setMsg(msgs[mi],chunks.length>1?`${needsAI.length} terms · ${chunks.length} batches`:'');},2000);
-    try{
-      for(let ci=0;ci<chunks.length;ci++){
-        setP(12+Math.round(((ci+1)/chunks.length)*83));
-        if(chunks.length>1)setMsg(msgs[mi%msgs.length],`Batch ${ci+1}/${chunks.length}`);
-        const res=await callGroq(chunks[ci],url,industry,focus,brand);
-        const seen=new Set();
-        for(const e of res.exclusions||[]){allExclusions.push({...e,src:'ai'});seen.add(e.term.toLowerCase());}
-        for(const k of res.kept||[]){allKept.push(k);seen.add(k.toLowerCase());}
-        for(const t of chunks[ci])if(!seen.has(t.toLowerCase()))allKept.push(t);
-        if(ci<chunks.length-1)await sleep(350);
+  if (needsAI.length > 0) {
+    var chunks = [];
+    for (var i = 0; i < needsAI.length; i += CHUNK) chunks.push(needsAI.slice(i, i + CHUNK));
+    var msgs = ['Detecting unknown company names...','Analyzing intent with Llama 3.3-70B...','Checking competitor brand signals...','Flagging ambiguous proper nouns...','Verifying borderline terms...'];
+    var mi = 0;
+    var iv = setInterval(function() { mi = (mi + 1) % msgs.length; setMsg(msgs[mi], chunks.length > 1 ? needsAI.length + ' terms · ' + chunks.length + ' batches' : ''); }, 2000);
+    try {
+      for (var ci = 0; ci < chunks.length; ci++) {
+        setP(12 + Math.round(((ci + 1) / chunks.length) * 83));
+        if (chunks.length > 1) setMsg(msgs[mi % msgs.length], 'Batch ' + (ci + 1) + '/' + chunks.length);
+        var res = await callGroq(chunks[ci], url, industry, focus, brand);
+        var seen = new Set();
+        (res.exclusions || []).forEach(function(e) { allExclusions.push(Object.assign({}, e, { src: 'ai' })); seen.add(e.term.toLowerCase()); });
+        (res.kept || []).forEach(function(k) { allKept.push(k); seen.add(k.toLowerCase()); });
+        chunks[ci].forEach(function(t) { if (!seen.has(t.toLowerCase())) allKept.push(t); });
+        if (ci < chunks.length - 1) await sleep(350);
       }
       clearInterval(iv);
-    }catch(err){
+    } catch(err) {
       clearInterval(iv);
       document.getElementById('loadSection').classList.remove('show');
-      document.getElementById('analyzeBtn').disabled=false;
-      let msg=err.message;
-      if(msg.includes('401')||msg.includes('invalid_api_key'))msg='Invalid API key. Go to console.groq.com/keys to get your key.';
-      else if(msg.includes('429'))msg='Rate limit hit. Wait 30 seconds and try again.';
-      showErr('Groq error: '+msg);
+      document.getElementById('analyzeBtn').disabled = false;
+      var msg = err.message;
+      if (msg.includes('401') || msg.includes('invalid_api_key')) msg = 'Invalid API key. Go to console.groq.com/keys to get your key.';
+      else if (msg.includes('429')) msg = 'Rate limit hit. Wait 30 seconds and try again.';
+      showErr('Groq error: ' + msg);
       return;
     }
   }
@@ -993,200 +1040,252 @@ async function runAnalysis(){
   setP(100);
   await sleep(300);
   document.getElementById('loadSection').classList.remove('show');
-  document.getElementById('analyzeBtn').disabled=false;
+  document.getElementById('analyzeBtn').disabled = false;
   renderResults();
 }
 
-async function callGroq(terms,url,industry,focus,brand){
-  const urlCtx=url?`Advertiser: "${url}". Brand to protect: "${brand}". Never exclude their brand.`:'No URL given. Be conservative — mark uncertain as ambiguous.';
-  const sys=`You are an expert Google Ads PPC specialist for a ${industry} business.
-${urlCtx}
-Focus: ${focus}
+async function callGroq(terms, url, industry, focus, brand) {
+  var urlCtx = url
+    ? 'Advertiser: "' + url + '". Brand to protect: "' + brand + '". Never exclude their brand.'
+    : 'No URL given. Be conservative — mark uncertain as ambiguous.';
 
-Types:
-- "irrelevant": job seekers, students, DIY, informational
-- "competitor": ANY company/brand/product name that is NOT the advertiser — even totally unknown ones. If it looks like a proper company name (e.g. "daintta cheltenham", "kybrix", "neozo gmbh"), flag it
-- "low_intent": free tool seekers, price shoppers, review hunters, comparison researchers  
-- "url_nav": URL-style searches, app names, website navigation searches
-- "ambiguous": proper nouns where you genuinely cannot tell if buyer or competitor
-- "geography": wrong location searches
-- "study": searches where someone is learning/researching the topic (not shopping) — e.g. "what is data engineering", "airflow tutorial"
+  var sys = 'You are an expert Google Ads PPC specialist for a ' + industry + ' business.\n'
+    + urlCtx + '\nFocus: ' + focus + '\n\n'
+    + 'Types:\n'
+    + '- "irrelevant": job seekers, students, DIY, informational\n'
+    + '- "competitor": ANY company/brand/product name that is NOT the advertiser — even totally unknown ones. If it looks like a proper company name (e.g. "daintta cheltenham", "kybrix", "neozo gmbh"), flag it\n'
+    + '- "low_intent": free tool seekers, price shoppers, review hunters, comparison researchers\n'
+    + '- "url_nav": URL-style searches, app names, website navigation searches\n'
+    + '- "ambiguous": proper nouns where you genuinely cannot tell if buyer or competitor\n'
+    + '- "geography": wrong location searches\n'
+    + '- "study": searches where someone is learning/researching the topic (not shopping)\n\n'
+    + 'Confidence 0-100. Keep terms with genuine buying intent.\n'
+    + 'Return ONLY raw JSON: {"exclusions":[{"term":"exact","type":"competitor","reason":"max 8 words","confidence":88}],"kept":["term1"]}';
 
-Confidence 0-100. Keep terms with genuine buying intent.
-Return ONLY raw JSON: {"exclusions":[{"term":"exact","type":"competitor","reason":"max 8 words","confidence":88}],"kept":["term1"]}`;
-
-  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
-    body:JSON.stringify({model:'llama-3.3-70b-versatile',temperature:0.1,max_tokens:4096,messages:[{role:'system',content:sys},{role:'user',content:`Classify these ${terms.length} terms:\n${terms.join('\n')}`}]})
+  var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.1,
+      max_tokens: 4096,
+      messages: [
+        { role: 'system', content: sys },
+        { role: 'user',   content: 'Classify these ' + terms.length + ' terms:\n' + terms.join('\n') }
+      ]
+    })
   });
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||'HTTP '+res.status);}
-  const data=await res.json();
-  let raw=(data.choices?.[0]?.message?.content||'{}').trim().replace(/```json|```/g,'').trim();
-  try{return JSON.parse(raw);}catch(e){const m=raw.match(/\{[\s\S]*\}/);return m?JSON.parse(m[0]):{exclusions:[],kept:[]};}
+
+  if (!res.ok) {
+    var e = await res.json().catch(function() { return {}; });
+    throw new Error((e && e.error && e.error.message) || 'HTTP ' + res.status);
+  }
+
+  var data = await res.json();
+  var raw = ((data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '{}')
+    .trim().replace(/```json|```/g, '').trim();
+  try { return JSON.parse(raw); }
+  catch(e) {
+    var m = raw.match(/\{[\s\S]*\}/);
+    return m ? JSON.parse(m[0]) : { exclusions: [], kept: [] };
+  }
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
-function renderResults(){
-  const ambC=allExclusions.filter(e=>e.type==='ambiguous').length;
-  const urlC=allExclusions.filter(e=>e.type==='url_nav').length;
-  const compC=allExclusions.filter(e=>e.type==='competitor').length;
+function renderResults() {
+  var ambC  = allExclusions.filter(function(e) { return e.type === 'ambiguous'; }).length;
+  var urlC  = allExclusions.filter(function(e) { return e.type === 'url_nav'; }).length;
+  var compC = allExclusions.filter(function(e) { return e.type === 'competitor'; }).length;
 
-  document.getElementById('sT').textContent=allTerms.length;
-  document.getElementById('sE').textContent=allExclusions.length;
-  document.getElementById('sK').textContent=allKept.length;
-  document.getElementById('sC').textContent=compC;
-  document.getElementById('sU').textContent=urlC;
-  document.getElementById('sA').textContent=ambC;
-  document.getElementById('resultSubtitle').textContent=`${allTerms.length} terms analyzed`;
+  document.getElementById('sT').textContent = allTerms.length;
+  document.getElementById('sE').textContent = allExclusions.length;
+  document.getElementById('sK').textContent = allKept.length;
+  document.getElementById('sC').textContent = compC;
+  document.getElementById('sU').textContent = urlC;
+  document.getElementById('sA').textContent = ambC;
+  document.getElementById('resultSubtitle').textContent = allTerms.length + ' terms analyzed';
 
-  let s=`Scanned <strong>${allTerms.length} terms</strong> · Recommending <strong>${allExclusions.length} exclusions</strong> · <strong style="color:var(--green)">${allKept.length} kept active</strong>.`;
-  if(ambC>0)s+=` <span class="wt">⚠ ${ambC} ambiguous terms need manual review.</span>`;
-  document.getElementById('sumBar').innerHTML=s;
+  var s = 'Scanned <strong>' + allTerms.length + ' terms</strong> · Recommending <strong>' + allExclusions.length + ' exclusions</strong> · <strong style="color:var(--green)">' + allKept.length + ' kept active</strong>.';
+  if (ambC > 0) s += ' <span class="wt">&#9888; ' + ambC + ' ambiguous terms need manual review.</span>';
+  document.getElementById('sumBar').innerHTML = s;
 
-  let alerts='';
-  if(ambC>0)alerts+=`<div class="alert al-amb">⚠ <strong>${ambC} ambiguous terms</strong> detected — possible competitor/brand names. Review in the "Ambiguous" tab before uploading to Google Ads.</div>`;
-  if(urlC>0)alerts+=`<div class="alert al-url">🔗 <strong>${urlC} navigational searches</strong> found — people looking for specific apps/websites, not your service.</div>`;
-  document.getElementById('alertsEl').innerHTML=alerts;
+  var alerts = '';
+  if (ambC > 0) alerts += '<div class="alert al-amb">&#9888; <strong>' + ambC + ' ambiguous terms</strong> detected — possible competitor/brand names. Review in the "Ambiguous" tab before uploading to Google Ads.</div>';
+  if (urlC > 0) alerts += '<div class="alert al-url">&#128279; <strong>' + urlC + ' navigational searches</strong> found — people looking for specific apps/websites, not your service.</div>';
+  document.getElementById('alertsEl').innerHTML = alerts;
 
-  buildTabs();currentTab='all';
-  renderExc();renderKept();updateCopyBox();
+  buildTabs(); currentTab = 'all';
+  renderExc(); renderKept(); updateCopyBox();
   document.getElementById('resultsWrap').classList.add('show');
 }
 
-function buildTabs(){
-  const defs=[{key:'all',label:'All'},{key:'competitor',label:'Competitors'},{key:'url_nav',label:'URL/Nav'},{key:'ambiguous',label:'Ambiguous'},{key:'irrelevant',label:'Irrelevant'},{key:'low_intent',label:'Low Intent'},{key:'study',label:'Study'},{key:'geography',label:'Geo'}];
-  tabDefs=defs.filter(d=>d.key==='all'||allExclusions.some(e=>e.type===d.key));
-  const el=document.getElementById('excTabs');el.innerHTML='';
-  tabDefs.forEach(d=>{
-    const cnt=d.key==='all'?allExclusions.length:allExclusions.filter(e=>e.type===d.key).length;
-    const btn=document.createElement('button');
-    btn.className='tab'+(d.key===currentTab?' active':'');
-    btn.innerHTML=d.label+`<span class="tn">${cnt}</span>`;
-    btn.onclick=()=>{currentTab=d.key;document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',tabDefs[i]&&tabDefs[i].key===d.key));renderExc();};
+function buildTabs() {
+  var defs = [
+    { key: 'all',        label: 'All'        },
+    { key: 'competitor', label: 'Competitors' },
+    { key: 'url_nav',    label: 'URL/Nav'    },
+    { key: 'ambiguous',  label: 'Ambiguous'  },
+    { key: 'irrelevant', label: 'Irrelevant' },
+    { key: 'low_intent', label: 'Low Intent' },
+    { key: 'study',      label: 'Study'      },
+    { key: 'geography',  label: 'Geo'        }
+  ];
+  tabDefs = defs.filter(function(d) {
+    return d.key === 'all' || allExclusions.some(function(e) { return e.type === d.key; });
+  });
+  var el = document.getElementById('excTabs');
+  el.innerHTML = '';
+  tabDefs.forEach(function(d, idx) {
+    var cnt = d.key === 'all' ? allExclusions.length : allExclusions.filter(function(e) { return e.type === d.key; }).length;
+    var btn = document.createElement('button');
+    btn.className = 'tab' + (d.key === currentTab ? ' active' : '');
+    btn.innerHTML = d.label + '<span class="tn">' + cnt + '</span>';
+    btn.onclick = (function(key, b) {
+      return function() {
+        currentTab = key;
+        document.querySelectorAll('.tab').forEach(function(tb, i) {
+          tb.classList.toggle('active', tabDefs[i] && tabDefs[i].key === key);
+        });
+        renderExc();
+      };
+    })(d.key, btn);
     el.appendChild(btn);
   });
 }
 
-const BDG={irrelevant:{c:'bi',l:'Irrelevant'},competitor:{c:'bc',l:'Competitor'},low_intent:{c:'bl',l:'Low Intent'},url_nav:{c:'bu',l:'URL/Nav'},ambiguous:{c:'ba',l:'Ambiguous'},geography:{c:'bge',l:'Geography'},study:{c:'bl',l:'Study'}};
+var BDG = {
+  irrelevant: { c: 'bi',  l: 'Irrelevant' },
+  competitor: { c: 'bc',  l: 'Competitor'  },
+  low_intent: { c: 'bl',  l: 'Low Intent'  },
+  url_nav:    { c: 'bu',  l: 'URL/Nav'     },
+  ambiguous:  { c: 'ba',  l: 'Ambiguous'   },
+  geography:  { c: 'bge', l: 'Geography'   },
+  study:      { c: 'bl',  l: 'Study'       }
+};
 
-function renderExc(){
-  const q=document.getElementById('excSearch').value.toLowerCase();
-  let items=currentTab==='all'?allExclusions:allExclusions.filter(e=>e.type===currentTab);
-  if(q)items=items.filter(e=>e.term.toLowerCase().includes(q));
-  document.getElementById('excCnt').textContent=allExclusions.length+' terms';
-  const el=document.getElementById('excList');
-  if(!items.length){el.innerHTML='<div class="list-empty">No terms in this category</div>';return;}
-  el.innerHTML=items.map(e=>{
-    const bd=BDG[e.type]||{c:'ba',l:'Review'};
-    const conf=e.confidence||75;
-    const cc=conf>=80?'chi':conf>=60?'cmd':'clo';
-    const hl=e.type==='ambiguous'?' hl-amb':e.type==='url_nav'?' hl-url':'';
-    const sp=e.src==='ai'?'<span class="src-pill sp-ai">AI</span>':'<span class="src-pill sp-rule">rule</span>';
-    return `<div class="kw-item${hl}">
-      <div class="kwr1"><span class="kwt" title="${esc(e.term)}">${esc(e.term)}</span>${sp}<span class="bdg ${bd.c}">${bd.l}</span></div>
-      <div class="kw-reason">${esc(e.reason||'')}</div>
-      <div class="conf-row"><span class="ctxt">${conf}%</span><div class="cbar"><div class="cfill ${cc}" style="width:${conf}%"></div></div></div>
-    </div>`;
+function renderExc() {
+  var q = document.getElementById('excSearch').value.toLowerCase();
+  var items = currentTab === 'all'
+    ? allExclusions
+    : allExclusions.filter(function(e) { return e.type === currentTab; });
+  if (q) items = items.filter(function(e) { return e.term.toLowerCase().includes(q); });
+  document.getElementById('excCnt').textContent = allExclusions.length + ' terms';
+  var el = document.getElementById('excList');
+  if (!items.length) { el.innerHTML = '<div class="list-empty">No terms in this category</div>'; return; }
+  el.innerHTML = items.map(function(e) {
+    var bd   = BDG[e.type] || { c: 'ba', l: 'Review' };
+    var conf = e.confidence || 75;
+    var cc   = conf >= 80 ? 'chi' : conf >= 60 ? 'cmd' : 'clo';
+    var hl   = e.type === 'ambiguous' ? ' hl-amb' : e.type === 'url_nav' ? ' hl-url' : '';
+    var sp   = e.src === 'ai' ? '<span class="src-pill sp-ai">AI</span>' : '<span class="src-pill sp-rule">rule</span>';
+    return '<div class="kw-item' + hl + '">'
+      + '<div class="kwr1"><span class="kwt" title="' + esc(e.term) + '">' + esc(e.term) + '</span>' + sp + '<span class="bdg ' + bd.c + '">' + bd.l + '</span></div>'
+      + '<div class="kw-reason">' + esc(e.reason || '') + '</div>'
+      + '<div class="conf-row"><span class="ctxt">' + conf + '%</span><div class="cbar"><div class="cfill ' + cc + '" style="width:' + conf + '%"></div></div></div>'
+      + '</div>';
   }).join('');
 }
 
-function renderKept(){
-  const q=document.getElementById('keptSearch').value.toLowerCase();
-  const items=q?allKept.filter(t=>t.toLowerCase().includes(q)):allKept;
-  document.getElementById('keptCnt').textContent=allKept.length+' terms';
-  const el=document.getElementById('keptList');
-  if(!items.length){el.innerHTML='<div class="list-empty">No kept terms</div>';return;}
-  el.innerHTML=items.map(t=>`<div class="kept-item"><div class="ktick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><span class="kterm">${esc(t)}</span></div>`).join('');
+function renderKept() {
+  var q = document.getElementById('keptSearch').value.toLowerCase();
+  var items = q ? allKept.filter(function(t) { return t.toLowerCase().includes(q); }) : allKept;
+  document.getElementById('keptCnt').textContent = allKept.length + ' terms';
+  var el = document.getElementById('keptList');
+  if (!items.length) { el.innerHTML = '<div class="list-empty">No kept terms</div>'; return; }
+  el.innerHTML = items.map(function(t) {
+    return '<div class="kept-item"><div class="ktick"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><span class="kterm">' + esc(t) + '</span></div>';
+  }).join('');
 }
 
-function updateCopyBox(){
-  const lines=allExclusions.filter(e=>e.type!=='ambiguous').map(e=>e.term);
-  document.getElementById('copyBox').textContent=lines.length?lines.join('\n'):'No confirmed exclusions.';
+function updateCopyBox() {
+  var lines = allExclusions.filter(function(e) { return e.type !== 'ambiguous'; }).map(function(e) { return e.term; });
+  document.getElementById('copyBox').textContent = lines.length ? lines.join('\n') : 'No confirmed exclusions.';
 }
 
-function copyConfirmed(){
-  navigator.clipboard.writeText(document.getElementById('copyBox').textContent).then(()=>{
-    const b=document.getElementById('copyBtn');b.textContent='✓ Copied!';b.classList.add('ok');
-    setTimeout(()=>{b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';b.classList.remove('ok');},2500);
+function copyConfirmed() {
+  navigator.clipboard.writeText(document.getElementById('copyBox').textContent).then(function() {
+    var b = document.getElementById('copyBtn');
+    b.textContent = '✓ Copied!';
+    b.classList.add('ok');
+    setTimeout(function() {
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+      b.classList.remove('ok');
+    }, 2500);
   });
 }
 
 // ── EXCEL EXPORT (4 SHEETS) ────────────────────────────────────────────────
-function exportExcel(){
-  if(!allExclusions.length&&!allKept.length){alert('No results to export yet. Run an analysis first.');return;}
+function exportExcel() {
+  if (!allExclusions.length && !allKept.length) { alert('No results to export yet. Run an analysis first.'); return; }
+  var wb = XLSX.utils.book_new();
 
-  const wb=XLSX.utils.book_new();
+  function makeSheet(data) { return XLSX.utils.aoa_to_sheet(data); }
 
-  function makeSheet(data){return XLSX.utils.aoa_to_sheet(data);}
+  var allNeg = allExclusions.filter(function(e) { return e.type !== 'ambiguous'; });
+  var s1 = [['All Negative Keywords'],['Generated by NegativeIQ · ' + new Date().toLocaleDateString()],[''],
+    ['Search Term','Category','Reason','Confidence %','Detected By']];
+  allNeg.forEach(function(e) { s1.push([e.term, capType(e.type), e.reason || '', e.confidence || '', e.src === 'ai' ? 'Groq AI' : 'Rule Engine']); });
+  s1.push([''],['Total:', allNeg.length, 'negative keywords']);
+  var ws1 = makeSheet(s1);
+  ws1['!cols'] = [{wch:40},{wch:16},{wch:45},{wch:14},{wch:14}];
+  ws1['!merges'] = [{s:{r:0,c:0},e:{r:0,c:4}}];
+  XLSX.utils.book_append_sheet(wb, ws1, 'All Negative Keywords');
 
-  const allNeg=allExclusions.filter(e=>e.type!=='ambiguous');
-  const s1=[['All Negative Keywords'],['Generated by NegativeIQ · '+new Date().toLocaleDateString()],[''],
-    ['Search Term','Category','Reason','Confidence %','Detected By']
-  ];
-  allNeg.forEach(e=>s1.push([e.term, capType(e.type), e.reason||'', e.confidence||'', e.src==='ai'?'Groq AI':'Rule Engine']));
-  s1.push([''],['Total:',allNeg.length,'negative keywords']);
-  const ws1=makeSheet(s1);
-  ws1['!cols']=[{wch:40},{wch:16},{wch:45},{wch:14},{wch:14}];
-  ws1['!merges']=[{s:{r:0,c:0},e:{r:0,c:4}}];
-  XLSX.utils.book_append_sheet(wb,ws1,'All Negative Keywords');
+  var companies = allExclusions.filter(function(e) { return e.type === 'competitor' || e.type === 'ambiguous'; });
+  var s2 = [['Company Names'],['Competitor brands and company name searches'],[''],
+    ['Search Term','Status','Reason','Confidence %','Action Required']];
+  companies.forEach(function(e) { s2.push([e.term, e.type === 'ambiguous' ? 'NEEDS REVIEW' : 'COMPETITOR', e.reason || '', e.confidence || '', e.type === 'ambiguous' ? 'Manually verify before excluding' : 'Add as negative keyword']); });
+  s2.push([''],['Total:', companies.length, 'company/brand terms found']);
+  var ws2 = makeSheet(s2);
+  ws2['!cols'] = [{wch:40},{wch:16},{wch:45},{wch:14},{wch:32}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Company Names');
 
-  const companies=allExclusions.filter(e=>e.type==='competitor'||e.type==='ambiguous');
-  const s2=[['Company Names'],['Competitor brands and company name searches'],[''],
-    ['Search Term','Status','Reason','Confidence %','Action Required']
-  ];
-  companies.forEach(e=>s2.push([e.term, e.type==='ambiguous'?'NEEDS REVIEW':'COMPETITOR', e.reason||'', e.confidence||'', e.type==='ambiguous'?'Manually verify before excluding':'Add as negative keyword']));
-  s2.push([''],['Total:',companies.length,'company/brand terms found']);
-  const ws2=makeSheet(s2);
-  ws2['!cols']=[{wch:40},{wch:16},{wch:45},{wch:14},{wch:32}];
-  XLSX.utils.book_append_sheet(wb,ws2,'Company Names');
+  var infoStudy = allExclusions.filter(function(e) { return e.type === 'irrelevant' || e.type === 'study'; });
+  var s3 = [['Informational Search Terms'],['Study / research purpose searches — not buying intent'],[''],
+    ['Search Term','Sub-Type','Reason','Confidence %','Why Exclude']];
+  infoStudy.forEach(function(e) { s3.push([e.term, e.type === 'study' ? 'Study/Research' : 'Irrelevant Intent', e.reason || '', e.confidence || '', 'User is learning, not shopping — no commercial intent']); });
+  s3.push([''],['Total:', infoStudy.length, 'informational/study terms']);
+  var ws3 = makeSheet(s3);
+  ws3['!cols'] = [{wch:40},{wch:18},{wch:45},{wch:14},{wch:45}];
+  XLSX.utils.book_append_sheet(wb, ws3, 'Study Purpose Terms');
 
-  const infoStudy=allExclusions.filter(e=>e.type==='irrelevant'||e.type==='study');
-  const s3=[['Informational Search Terms'],['Study / research purpose searches — not buying intent'],[''],
-    ['Search Term','Sub-Type','Reason','Confidence %','Why Exclude']
-  ];
-  infoStudy.forEach(e=>s3.push([e.term, e.type==='study'?'Study/Research':'Irrelevant Intent', e.reason||'', e.confidence||'', 'User is learning, not shopping — no commercial intent']));
-  s3.push([''],['Total:',infoStudy.length,'informational/study terms']);
-  const ws3=makeSheet(s3);
-  ws3['!cols']=[{wch:40},{wch:18},{wch:45},{wch:14},{wch:45}];
-  XLSX.utils.book_append_sheet(wb,ws3,'Study Purpose Terms');
-
-  const s4=[['Related Search Terms'],['These terms are KEPT ACTIVE — relevant buying intent searches'],[''],
-    ['Search Term','Status','Notes']
-  ];
-  allKept.forEach(t=>s4.push([t,'ACTIVE','Relevant — keep running ads on this term']));
-  const others=allExclusions.filter(e=>e.type==='low_intent'||e.type==='geography'||e.type==='url_nav');
-  if(others.length){
+  var s4 = [['Related Search Terms'],['These terms are KEPT ACTIVE — relevant buying intent searches'],[''],
+    ['Search Term','Status','Notes']];
+  allKept.forEach(function(t) { s4.push([t, 'ACTIVE', 'Relevant — keep running ads on this term']); });
+  var others = allExclusions.filter(function(e) { return e.type === 'low_intent' || e.type === 'geography' || e.type === 'url_nav'; });
+  if (others.length) {
     s4.push([''],['Other Excluded Terms (Low Intent / URL / Geography)','','']);
     s4.push(['Search Term','Category','Reason']);
-    others.forEach(e=>s4.push([e.term,capType(e.type),e.reason||'']));
+    others.forEach(function(e) { s4.push([e.term, capType(e.type), e.reason || '']); });
   }
-  s4.push([''],['Active terms:',allKept.length,''],['Other excluded:',others.length,'']);
-  const ws4=makeSheet(s4);
-  ws4['!cols']=[{wch:40},{wch:16},{wch:50}];
-  XLSX.utils.book_append_sheet(wb,ws4,'Related Search Terms');
+  s4.push([''],['Active terms:', allKept.length, ''],['Other excluded:', others.length, '']);
+  var ws4 = makeSheet(s4);
+  ws4['!cols'] = [{wch:40},{wch:16},{wch:50}];
+  XLSX.utils.book_append_sheet(wb, ws4, 'Related Search Terms');
 
-  const date=new Date().toISOString().slice(0,10);
-  XLSX.writeFile(wb,`NegativeIQ_Keywords_${date}.xlsx`);
+  var date = new Date().toISOString().slice(0, 10);
+  XLSX.writeFile(wb, 'NegativeIQ_Keywords_' + date + '.xlsx');
 }
 
-function capType(t){return({irrelevant:'Irrelevant Intent',competitor:'Competitor Brand',low_intent:'Low Intent',url_nav:'URL/Navigational',ambiguous:'Ambiguous',geography:'Geography',study:'Study/Research'}[t])||t;}
+function capType(t) {
+  return ({ irrelevant: 'Irrelevant Intent', competitor: 'Competitor Brand', low_intent: 'Low Intent', url_nav: 'URL/Navigational', ambiguous: 'Ambiguous', geography: 'Geography', study: 'Study/Research' }[t]) || t;
+}
 
-function resetTool(){
-  document.getElementById('termsInput').value='';
-  document.getElementById('companyUrl').value='';
+function resetTool() {
+  document.getElementById('termsInput').value = '';
+  document.getElementById('companyUrl').value = '';
   document.getElementById('resultsWrap').classList.remove('show');
-  document.getElementById('emptyState').style.display='flex';
+  document.getElementById('emptyState').style.display = 'flex';
   document.getElementById('errBox').classList.remove('show');
-  document.getElementById('analyzeBtn').disabled=false;
-  allExclusions=[];allKept=[];allTerms=[];
+  document.getElementById('analyzeBtn').disabled = false;
+  allExclusions = []; allKept = []; allTerms = [];
 }
 
-function setP(v){document.getElementById('progFill').style.width=v+'%';}
-function setMsg(m,s){document.getElementById('loadMsg').textContent=m;document.getElementById('loadSub').textContent=s||'';}
-function showErr(m){const el=document.getElementById('errBox');el.textContent=m;el.classList.add('show');}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function setP(v)    { document.getElementById('progFill').style.width = v + '%'; }
+function setMsg(m,s){ document.getElementById('loadMsg').textContent = m; document.getElementById('loadSub').textContent = s || ''; }
+function showErr(m) { var el = document.getElementById('errBox'); el.textContent = m; el.classList.add('show'); }
+function sleep(ms)  { return new Promise(function(r) { setTimeout(r, ms); }); }
+function esc(s)     { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 </script>
 
 </body>
